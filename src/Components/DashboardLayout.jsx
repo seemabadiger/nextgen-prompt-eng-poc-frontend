@@ -8,6 +8,8 @@ import UploadMockupModal from './UploadMockupModal';
 import NavbarComponent from './Navbar';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { AuthContext } from '../Context/AuthContext';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
@@ -27,7 +29,11 @@ const DashboardLayout = () => {
   const [selectedMockups, setSelectedMockups] = useState([]);
   const [activeButton, setActiveButton] = useState('');
   const navigate = useNavigate(); // Use useNavigate hook
-
+  const [favorites, setFavorites] = useState([]);
+  
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
+  
   // Fetch mockups on component mount
   useEffect(() => {
     if (user) {
@@ -223,6 +229,52 @@ const DashboardLayout = () => {
     navigate(`/mockup/${mockup.id}`, { state: { mockup } });
   };
 
+  // function to handle favoriting
+  const fetchFavorites = async () => {
+    if (!user) return;
+    
+    setIsLoadingFavorites(true);
+    try {
+      const response = await axios.get(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${user.id}/favorites`);
+      setFavorites(response.data.map(favorite => favorite.mockupId));
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      // Optionally, show an error message to the user
+    } finally {
+      setIsLoadingFavorites(false);
+    }
+  };
+
+  const handleFavorite = async (e, mockupId) => {
+    e.stopPropagation();
+    try {
+      if (favorites.includes(mockupId)) {
+        // Remove from favorites
+        await axios.delete(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${user.id}/favorites/${mockupId}`);
+        setFavorites(prevFavorites => prevFavorites.filter(id => id !== mockupId));
+      } else {
+        // Add to favorites
+        await axios.post(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${user.id}/favorites`, {
+          mockupId: mockupId
+        });
+        setFavorites(prevFavorites => [...prevFavorites, mockupId]);
+      }
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+    }
+  };
+  
+  const toggleFavorites = async () => {
+    if (!showFavorites) {
+      // If we're about to show favorites, fetch them first
+      await fetchFavorites();
+    }
+    setShowFavorites(!showFavorites);
+  };
+
+  const displayedMockups = showFavorites ? mockups.filter(mockup => favorites.includes(mockup.id)) : mockups;
+
+
   return (
     <div>
       <NavbarComponent setMockups={setMockups} showModal={handleShow} />
@@ -241,6 +293,25 @@ const DashboardLayout = () => {
             ))}
           </div>
           <div className="d-flex align-items-center">
+          {/* <Button 
+               variant={showFavorites ? "secondary" : "outline-secondary"}
+              // variant="outline-secondary" 
+              className="me-2 d-flex align-items-center"
+              onClick={toggleFavorites}
+            >
+              <FavoriteIcon fontSize="small" className="me-2" />
+              My Favorite
+            </Button> */}
+
+            <Button 
+              variant={showFavorites ? "secondary" : "outline-secondary"} 
+              className="me-2 d-flex align-items-center"
+              onClick={toggleFavorites}
+              disabled={isLoadingFavorites}
+            >
+              <FavoriteIcon fontSize="small" className="me-2" />
+              {isLoadingFavorites ? 'Loading...' : 'My Favorite'}
+            </Button>
             <Button variant="outline-secondary" className="me-2 d-flex align-items-center">
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
@@ -258,12 +329,22 @@ const DashboardLayout = () => {
           {mockups.map(mockup => (
             <Col sm={3} key={mockup.id} className="mb-3">
               <Card className='template-card' onClick={() => handleCardClick(mockup)}>
-                <div className="checkbox-container">
+
+              <div className="checkbox-container d-flex align-items-center">
+                <FavoriteIcon 
+                  className="me-2"
+                  style={{ 
+                    cursor: 'pointer',
+                    color: favorites.includes(mockup.id) ? 'red' : 'grey',
+                    fontSize: '1.25rem' // Adjust this value to match the checkbox size
+                  }}
+                  onClick={(e) => handleFavorite(e, mockup.id)}
+                />
                 <Form.Check 
                   type="checkbox" 
                   checked={selectedMockups.includes(mockup.id)} 
                   onChange={(e) => handleCheckboxChange(e, mockup.id)} 
-                  onClick={(e) => e.stopPropagation()} // Stop event propagation to prevent card click
+                  onClick={(e) => e.stopPropagation()} 
                 />
                 </div>
                 <Carousel interval={null} onClick={handleCarouselClick}>
