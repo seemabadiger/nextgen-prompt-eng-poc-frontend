@@ -33,11 +33,17 @@ const DashboardLayout = () => {
   
   const [showFavorites, setShowFavorites] = useState(false);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
+
+  // 
+  const [likedMockups, setLikedMockups] = useState([]);
+  const [showLiked, setShowLiked] = useState(false);
+  const [isLoadingLikes, setIsLoadingLikes] = useState(false);
   
   // Fetch mockups on component mount
   useEffect(() => {
     if (user) {
       fetchMockups(user.id);
+      fetchFavorites();
     }
   }, [user]);
 
@@ -49,7 +55,7 @@ const DashboardLayout = () => {
   }, [sortOption]);
 
   const fetchMockups = (userId) => {
-      axios.get(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${userId}/mockups`)
+      axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`)
       .then(response => {
         const fetchedMockups = response.data.map(mockup => ({
           id: mockup.id,
@@ -89,9 +95,9 @@ const DashboardLayout = () => {
     setSortOption(sort);
     let apiUrl;
     if (sort === 'Alphabetically') {
-        apiUrl = `https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/alphabetical?userId=${user.id}`;
+        apiUrl = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
     } else {
-        apiUrl = `https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/recent?userId=${user.id}`;
+        apiUrl = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
     }
 
     axios.get(apiUrl)
@@ -114,7 +120,7 @@ const DashboardLayout = () => {
 
   const handleDomainFilter = (domainName) => {
     setActiveButton(domainName);
-      axios.get(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`)
+      axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`)
       .then(response => {
         const filteredMockups = response.data.map(mockup => ({
           id: mockup.id,
@@ -229,51 +235,49 @@ const DashboardLayout = () => {
     navigate(`/mockup/${mockup.id}`, { state: { mockup } });
   };
 
-  // function to handle favoriting
   const fetchFavorites = async () => {
     if (!user) return;
     
     setIsLoadingFavorites(true);
     try {
-      const response = await axios.get(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${user.id}/favorites`);
-      setFavorites(response.data.map(favorite => favorite.mockupId));
+      const response = await axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`);
+      const favoriteIds = response.data.map(favorite => favorite.mockupGroupId);
+      setFavorites(favoriteIds);
     } catch (error) {
       console.error('Error fetching favorites:', error);
-      // Optionally, show an error message to the user
     } finally {
       setIsLoadingFavorites(false);
     }
   };
 
   const handleFavorite = async (e, mockupId) => {
+    e.preventDefault();
     e.stopPropagation();
+    
     try {
       if (favorites.includes(mockupId)) {
         // Remove from favorites
-        await axios.delete(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${user.id}/favorites/${mockupId}`);
-        setFavorites(prevFavorites => prevFavorites.filter(id => id !== mockupId));
+        await axios.delete(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/like/${mockupId}`);
+        setFavorites(prev => prev.filter(id => id !== mockupId));
       } else {
         // Add to favorites
-        await axios.post(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/${user.id}/favorites`, {
-          mockupId: mockupId
-        });
-        setFavorites(prevFavorites => [...prevFavorites, mockupId]);
+        await axios.post(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/like/${mockupId}`);
+        setFavorites(prev => [...prev, mockupId]);
       }
     } catch (error) {
       console.error('Error updating favorites:', error);
     }
   };
-  
-  const toggleFavorites = async () => {
-    if (!showFavorites) {
-      // If we're about to show favorites, fetch them first
-      await fetchFavorites();
-    }
+
+  const toggleFavorites = () => {
     setShowFavorites(!showFavorites);
   };
 
-  const displayedMockups = showFavorites ? mockups.filter(mockup => favorites.includes(mockup.id)) : mockups;
+  const displayedMockups = showFavorites 
+    ? mockups.filter(mockup => favorites.includes(mockup.id))
+    : mockups;
 
+  
 
   return (
     <div>
@@ -304,13 +308,13 @@ const DashboardLayout = () => {
             </Button> */}
 
             <Button 
-              variant={showFavorites ? "secondary" : "outline-secondary"} 
+              variant={showFavorites ? "secondary" : "outline-secondary"}
               className="me-2 d-flex align-items-center"
               onClick={toggleFavorites}
               disabled={isLoadingFavorites}
             >
               <FavoriteIcon fontSize="small" className="me-2" />
-              {isLoadingFavorites ? 'Loading...' : 'My Favorite'}
+              {isLoadingFavorites ? 'Loading...' : 'My Favorites'}
             </Button>
             <Button variant="outline-secondary" className="me-2 d-flex align-items-center">
               <GetAppIcon fontSize="small" className="me-2" />
@@ -335,7 +339,7 @@ const DashboardLayout = () => {
                   className="me-2"
                   style={{ 
                     cursor: 'pointer',
-                    color: favorites.includes(mockup.id) ? 'red' : 'grey',
+                    color: likedMockups.includes(mockup.id) ? 'red' : 'grey',
                     fontSize: '1.25rem' // Adjust this value to match the checkbox size
                   }}
                   onClick={(e) => handleFavorite(e, mockup.id)}
