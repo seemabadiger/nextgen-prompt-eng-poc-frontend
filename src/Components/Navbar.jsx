@@ -24,8 +24,8 @@ const NavbarComponent = ({ setMockups, showModal }) => {
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         const url = searchQuery
-      ? `https://localhost:7231/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`
-      : `https://localhost:7231/api/FileUploadAPI/${user?.id}/mockups`;
+      ? `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`
+      : `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user?.id}/mockups`;
         axios.get(url)
           .then(response => {
             const searchResults = response.data.map(mockup => ({
