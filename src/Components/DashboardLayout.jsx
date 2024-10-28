@@ -114,6 +114,7 @@ const DashboardLayout = () => {
 
   const handleDomainFilter = (domainName) => {
     setActiveButton(domainName);
+    setShowFavorites(false); // Reset showFavorites state
     axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`)
       .then(response => {
         const filteredMockups = response.data.map(mockup => ({
@@ -282,6 +283,7 @@ const DashboardLayout = () => {
   const displayedMockups = showFavorites
     ? mockups.filter(mockup => favorites.includes(mockup.id))
     : mockups;
+
   return (
     <div>
       <NavbarComponent setMockups={setMockups} showModal={handleShow} />
@@ -300,7 +302,7 @@ const DashboardLayout = () => {
             ))}
           </div>
           <div className="d-flex align-items-center">
-          <Button
+            <Button
               variant={showFavorites ? "secondary" : "outline-secondary"}
               className="me-2 d-flex align-items-center"
               onClick={toggleFavorites}
