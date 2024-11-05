@@ -11,6 +11,8 @@ const NavbarComponent = ({ setMockups, showModal }) => {
     const { user, logout } = useContext(AuthContext);
     const [selectedTab, setSelectedTab] = useState('visual-samples');
     const [searchQuery, setSearchQuery] = useState('');
+    const [noMockupsFound, setNoMockupsFound] = useState(false);
+    const [emptySearchQuery, setEmptySearchQuery] = useState(false);
 
     const handleTabClick = (tab) => {
         setSelectedTab(tab);
@@ -23,29 +25,43 @@ const NavbarComponent = ({ setMockups, showModal }) => {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        const url = searchQuery
-      ? `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`
-      : `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user?.id}/mockups`;
+        if (!searchQuery) {
+            setEmptySearchQuery(true);
+            setNoMockupsFound(false);
+            setMockups([]);
+            setTimeout(() => {
+                setEmptySearchQuery(false);
+            }, 1000);
+            return;
+        }
+        setEmptySearchQuery(false);
+        const url = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
         axios.get(url)
-          .then(response => {
-            const searchResults = response.data.map(mockup => ({
-                id: mockup.id,
-                title: mockup.projectTitle,
-                description: mockup.projectDescription,
-                images: mockup.mockups.map(m => m.filePath),
-                tags: mockup.tags.map(tag => tag.name),
-                domainname: mockup.domain.name,
-                subdomainname: mockup.subdomain.name
-            }));
-            setMockups(searchResults);
-          })
-          .catch(error => {
-            console.error('Error fetching search results:', error);
-          });
-      };
+            .then(response => {
+                const searchResults = response.data.map(mockup => ({
+                    id: mockup.id,
+                    title: mockup.projectTitle,
+                    description: mockup.projectDescription,
+                    images: mockup.mockups.map(m => m.filePath),
+                    tags: mockup.tags.map(tag => tag.name),
+                    domainname: mockup.domain.name,
+                    subdomainname: mockup.subdomain.name
+                }));
+                setMockups(searchResults);
+                setNoMockupsFound(searchResults.length === 0);
+            })
+            .catch(error => {
+                console.error('Error fetching search results:', error);
+                setNoMockupsFound(true);
+            });
+    };
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
+        if (!e.target.value) {
+            setNoMockupsFound(false);
+            setEmptySearchQuery(false);
+        }
     };
 
     return (
@@ -61,7 +77,9 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                     />
                 </Navbar.Brand>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => showModal(!0)} style={{ ...buttonStyle, background: 'transparent', color: '#fff', border: 'none' }}>Upload Mockup</button>
+                    {user?.role?.toLowerCase() === 'admin' && (
+                        <button onClick={() => showModal(!0)} style={{ ...buttonStyle, background: 'transparent', color: '#fff', border: 'none' }}>Upload Mockup</button>
+                    )}
                     <NavDropdown title={<span>{user?.name} <img src={Avatar} alt="Avatar" style={{ width: '30px', height: '30px', borderRadius: '50%', marginLeft: '10px' }} /></span>} id="user-menu-dropdown" style={{ ...buttonStyle, background: 'transparent', color: '#fff', border: 'none' }}>
                         <NavDropdown.Item href="#logout" onClick={handleLogout}>Logout</NavDropdown.Item>
                     </NavDropdown>
@@ -114,6 +132,16 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                                 <button type='submit' style={{ ...buttonStyle, background: '#6C67E1', height: '40px', alignSelf: 'center', marginLeft: '10px' }}>Search Mockup</button>
                             </div>
                         </Form>
+                        {emptySearchQuery && (
+                            <div style={{ marginTop: '10px', color: 'red' }}>
+                                Please enter a keyword.
+                            </div>
+                        )}
+                        {searchQuery && noMockupsFound && (
+                            <div style={{ marginTop: '10px', color: 'red' }}>
+                                No mockups found for the entered keyword.
+                            </div>
+                        )}
                     </div>
                 </div>
             </Navbar.Collapse>
@@ -131,7 +159,7 @@ const tabStyle = {
 };
 
 const textBoxParentContainer = {
-    boxShadow:'rgba(149, 157, 165, 0.2) 0px 8px 24px;'
+    boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px;'
 };
 
 const labelStyle = {
