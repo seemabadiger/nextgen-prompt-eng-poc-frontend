@@ -30,6 +30,7 @@ const DashboardLayout = () => {
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
+  const [noMockupsFound, setNoMockupsFound] = useState(false);
 
   // Fetch mockups on component mount
   useEffect(() => {
@@ -59,6 +60,7 @@ const DashboardLayout = () => {
           subdomainname: mockup.subdomain.name
         }));
         setMockups(fetchedMockups);
+        setNoMockupsFound(fetchedMockups.length === 0);
       })
       .catch(error => {
         console.error('Error fetching mockups:', error);
@@ -104,6 +106,7 @@ const DashboardLayout = () => {
           subdomainname: mockup.subdomain.name
         }));
         setMockups(sortedMockups);
+        setNoMockupsFound(sortedMockups.length === 0);
       })
       .catch(error => {
         console.error('Error fetching sorted mockups:', error);
@@ -125,10 +128,12 @@ const DashboardLayout = () => {
           subdomainname: mockup.subdomain.name
         }));
         setMockups(filteredMockups);
+        setNoMockupsFound(filteredMockups.length === 0);
       })
       .catch(error => {
         console.error('Error fetching filtered mockups:', error);
         setMockups([]);
+        setNoMockupsFound(true);
       });
   };
 
@@ -294,19 +299,25 @@ const DashboardLayout = () => {
             ))}
           </div>
           <div className="d-flex align-items-center">
-            <Button
-              variant={showFavorites ? "secondary" : "outline-secondary"}
-              className="me-2 d-flex align-items-center"
-              onClick={toggleFavorites}
-              disabled={isLoadingFavorites}
-            >
-              <FavoriteIcon fontSize="small" className="me-2" />
-              {isLoadingFavorites ? 'Loading...' : 'My Favorites'}
-            </Button>
-            <Button variant="outline-secondary" className="me-2 d-flex align-items-center">
+            {user?.role === 'User' && (
+                <Button
+                variant={showFavorites ? "secondary" : "outline-secondary"}
+                className="me-2 d-flex align-items-center"
+                onClick={toggleFavorites}
+                disabled={isLoadingFavorites}
+              >
+                <FavoriteIcon fontSize="small" className="me-2" />
+                {isLoadingFavorites ? 'Loading...' : 'My Favorites'}
+              </Button>
+
+            )}
+
+            {user?.role === 'Admin' && (
+              <Button variant="outline-secondary" className="me-2 d-flex align-items-center">
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
             </Button>
+            )}
             <Dropdown>
               <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">Sort By {sortOption}</Dropdown.Toggle>
               <Dropdown.Menu>
@@ -316,49 +327,55 @@ const DashboardLayout = () => {
             </Dropdown>
           </div>
         </div>
-        <Row className="mt-4">
-          {displayedMockups.map(mockup => (
-            <Col sm={3} key={mockup.id} className="mb-3">
-              <Card className='template-card' onClick={() => handleCardClick(mockup)}>
-                <div className="checkbox-container d-flex align-items-center">
-                  <FavoriteIcon
-                    className="me-2"
-                    style={{
-                      cursor: 'pointer',
-                      color: favorites.includes(mockup.id) ? 'red' : 'grey',
-                      fontSize: '1.25rem' // Adjust this value to match the checkbox size
-                    }}
-                    onClick={(e) => handleFavorite(e, mockup.id)}
-                  />
-                  <Form.Check
-                    type="checkbox"
-                    checked={selectedMockups.includes(mockup.id)}
-                    onChange={(e) => handleCheckboxChange(e, mockup.id)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-                <Carousel interval={null} onClick={handleCarouselClick}>
-                  {mockup.images.map((image, index) => (
-                    <Carousel.Item key={index}>
-                      <img className="d-block w-100 cardImg" src={image} alt={`Slide ${index}`} />
-                    </Carousel.Item>
-                  ))}
-                </Carousel>
-                <Card.Body>
-                  <Card.Title>{mockup.domainname}| {mockup.subdomainname}</Card.Title>
-                  <Card.Text>{mockup.title}</Card.Text>
-                  <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
-                    {mockup.tags.map(tag => (
-                      <ListGroup.Item key={tag} className="border-0 p-0 me-2">
-                        <Badge bg="secondary">{tag}</Badge>
-                      </ListGroup.Item>
+        {noMockupsFound ? (
+          <p>No mockups found for the entered keyword.</p>
+        ) : (
+          <Row className="mt-4">
+            {displayedMockups.map(mockup => (
+              <Col sm={3} key={mockup.id} className="mb-3">
+                <Card className='template-card' onClick={() => handleCardClick(mockup)}>
+                  <div className="checkbox-container d-flex align-items-center">
+                    {user?.role === 'User' && (
+                      <FavoriteIcon
+                      className="me-2"
+                      style={{
+                        cursor: 'pointer',
+                        color: favorites.includes(mockup.id) ? 'red' : 'grey',
+                        fontSize: '1.25rem' // Adjust this value to match the checkbox size
+                      }}
+                      onClick={(e) => handleFavorite(e, mockup.id)}
+                    />
+                    )}
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectedMockups.includes(mockup.id)}
+                      onChange={(e) => handleCheckboxChange(e, mockup.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                  <Carousel interval={null} onClick={handleCarouselClick}>
+                    {mockup.images.map((image, index) => (
+                      <Carousel.Item key={index}>
+                        <img className="d-block w-100 cardImg" src={image} alt={`Slide ${index}`} />
+                      </Carousel.Item>
                     ))}
-                  </ListGroup>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                  </Carousel>
+                  <Card.Body>
+                    <Card.Title>{mockup.domainname}| {mockup.subdomainname}</Card.Title>
+                    <Card.Text>{mockup.title}</Card.Text>
+                    <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
+                      {mockup.tags.map(tag => (
+                        <ListGroup.Item key={tag} className="border-0 p-0 me-2">
+                          <Badge bg="secondary">{tag}</Badge>
+                        </ListGroup.Item>
+                      ))}
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
       </Container>
       <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} />
     </div>
