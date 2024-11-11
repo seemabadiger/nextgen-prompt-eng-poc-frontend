@@ -7,6 +7,7 @@ import UploadMockupModal from './UploadMockupModal';
 import NavbarComponent from './Navbar';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { AuthContext } from '../Context/AuthContext';
+import generatePdf from '../utils/htmlToPdf';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const DashboardLayout = () => {
@@ -25,6 +26,7 @@ const DashboardLayout = () => {
     Image: ''
   });
   const [selectedMockups, setSelectedMockups] = useState([]);
+  const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState([]);
   const [activeButton, setActiveButton] = useState('');
   const navigate = useNavigate(); // Use useNavigate hook
   const [favorites, setFavorites] = useState([]);
@@ -138,7 +140,7 @@ const DashboardLayout = () => {
   };
 
   const handleDelete = (mockup) => {
-    axios.delete(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/delete/${mockup.id}`)
+    axios.delete(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`)
       .then(() => {
         setMockups(prevMockups => prevMockups.filter(item => item.id !== mockup.id));
         console.log('Mockup deleted successfully');
@@ -193,7 +195,7 @@ const DashboardLayout = () => {
     formData.append('Image', updateForm.Image);
 
     if (selectedMockup) {
-      axios.put(`https://hxstudio-ffegcph6gpb7ccg7.eastus-01.azurewebsites.net/fileuploadservice/api/FileUploadAPI/update/${selectedMockup.id}`, formData, {
+      axios.put(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/update/${selectedMockup.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -216,13 +218,19 @@ const DashboardLayout = () => {
 
   const handleCheckboxChange = (e, mockupId) => {
     e.stopPropagation(); // Stop event propagation to prevent card click
+    let selected = [];
     setSelectedMockups(prevSelected => {
       if (prevSelected.includes(mockupId)) {
-        return prevSelected.filter(id => id !== mockupId);
+        const mockupIds = prevSelected.filter(id => id !== mockupId);
+        selected = mockups.filter(mockup => mockupIds.includes(mockup.id));
+        return mockupIds
       } else {
-        return [...prevSelected, mockupId];
+        const mockupIds = [...prevSelected, mockupId];
+        selected = mockups.filter(mockup => mockupIds.includes(mockup.id));
+        return mockupIds;
       }
     });
+    setSelectedMockupsForDownload(selected);
   };
 
   const handleCarouselClick = (e) => {
