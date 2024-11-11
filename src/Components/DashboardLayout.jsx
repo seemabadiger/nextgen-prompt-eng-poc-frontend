@@ -235,7 +235,7 @@ const DashboardLayout = () => {
     <div>
       <NavbarComponent setMockups={setMockups} showModal={handleShow} />
       <Container style={{ marginTop: '60px' }}>
-        <div className="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <div className="d-flex justify-content-between align-items-center mb-4 mt-3 inner-tabs">
           <div className="d-flex flex-wrap">
             {['All', 'Mobile', 'Moodle', 'WordPress', 'Analytics', 'HRTech', 'EdTech', 'HealthTech'].map(domain => (
               <Button
@@ -282,8 +282,8 @@ const DashboardLayout = () => {
                   ))}
                 </Carousel>
                 <Card.Body>
-                  <Card.Title>{mockup.domainname}| {mockup.subdomainname}</Card.Title>
-                  <Card.Text>{mockup.title}</Card.Text>
+                  <Card.Text><span className='purpal-clr fw-bold'>{mockup.domainname}</span> | {mockup.subdomainname}</Card.Text>
+                  <Card.Title className='fw-bold mb-3'>{mockup.title}</Card.Title>
                   <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
                     {mockup.tags.map(tag => (
                       <ListGroup.Item key={tag} className="border-0 p-0 me-2">

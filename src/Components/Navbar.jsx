@@ -49,13 +49,13 @@ const NavbarComponent = ({ setMockups, showModal }) => {
     };
 
     return (
-        <Navbar expand="lg" style={{ backgroundImage: `url(${HeaderBackground})`, padding: '10px', flexDirection: 'column', opacity: 0.9 }}>
-            <div className='container' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '10px' }}>
-                <Navbar.Brand href="#home" style={{ display: 'flex', alignItems: 'center' }}>
+        <Navbar expand="lg" style={{ backgroundImage: `url(${HeaderBackground})`, padding: '9px 0 0 0', flexDirection: 'column' }}>
+            <div className='container' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <Navbar.Brand className='pt-3 pb-0' href="#home" style={{ display: 'flex', alignItems: 'center' }}>
                     <img
                         src={Logo}
-                        width="80"
-                        height="80"
+                        width="136"
+                        height="89"
                         className="d-inline-block align-top"
                         alt="Logo"
                     />
@@ -68,50 +68,52 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                 </div>
             </div>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse className='w-100' id="basic-navbar-nav" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '10px', transform: 'translateY(50px)' }}>
+            <Navbar.Collapse className='w-100' id="basic-navbar-nav" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', transform: 'translateY(50px)' }}>
                 <div className='container' style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <Nav className="ml-auto" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <Nav className="ml-auto main-nav-tab" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Nav.Link
                             href="#visual-samples"
-                            style={{ ...tabStyle, color: selectedTab === 'visual-samples' ? '#000' : '#fff', background: selectedTab === 'visual-samples' ? '#fff' : 'transparent', fontWeight: selectedTab === 'visual-samples' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px', paddingBottom: '0px' }}
+                            style={{ ...tabStyle, color: selectedTab === 'visual-samples' ? '#000' : '#fff', background: selectedTab === 'visual-samples' ? '#fff' : 'transparent', fontWeight: selectedTab === 'visual-samples' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px' }}
                             onClick={() => handleTabClick('visual-samples')}
                         >
-                            <span style={{ padding: '0 10px 6px 10px', height: '100%', display: 'inline-block' }}>Visual Samples</span>
+                            <span style={{ padding: '0 0 6px 0', height: '100%', display: 'inline-block' }}>Visual Samples</span>
                         </Nav.Link>
                         <Nav.Link
                             href="#case-studies"
-                            style={{ ...tabStyle, color: selectedTab === 'case-studies' ? '#000' : '#fff', background: selectedTab === 'case-studies' ? '#fff' : 'transparent', fontWeight: selectedTab === 'case-studies' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px', paddingBottom: '0px' }}
+                            style={{ ...tabStyle, color: selectedTab === 'case-studies' ? '#000' : '#fff', background: selectedTab === 'case-studies' ? '#fff' : 'transparent', fontWeight: selectedTab === 'case-studies' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px'}}
                             onClick={() => handleTabClick('case-studies')}
                         >
-                            <span style={{ padding: '0 10px 6px 10px', height: '100%', display: 'inline-block' }}>Case Studies</span>
+                            <span style={{ padding: '0 0 6px 0', height: '100%', display: 'inline-block' }}>Case Studies</span>
                         </Nav.Link>
                         <Nav.Link
                             href="#process-diagram"
-                            style={{ ...tabStyle, color: selectedTab === 'process-diagram' ? '#000' : '#fff', background: selectedTab === 'process-diagram' ? '#fff' : 'transparent', fontWeight: selectedTab === 'process-diagram' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px', paddingBottom: '0px' }}
+                            style={{ ...tabStyle, color: selectedTab === 'process-diagram' ? '#000' : '#fff', background: selectedTab === 'process-diagram' ? '#fff' : 'transparent', fontWeight: selectedTab === 'process-diagram' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px'}}
                             onClick={() => handleTabClick('process-diagram')}
                         >
-                            <span style={{ padding: '0 10px 6px 10px', height: '100%', display: 'inline-block' }}>Process Diagram & Artifacts</span>
+                            <span style={{ padding: '0 0 6px 0', height: '100%', display: 'inline-block' }}>Process Diagram & Artifacts</span>
                         </Nav.Link>
                         <Nav.Link
                             href="#before-after"
-                            style={{ ...tabStyle, color: selectedTab === 'before-after' ? '#000' : '#fff', background: selectedTab === 'before-after' ? '#fff' : 'transparent', fontWeight: selectedTab === 'before-after' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px', paddingBottom: '0px' }}
+                            style={{ ...tabStyle, color: selectedTab === 'before-after' ? '#000' : '#fff', background: selectedTab === 'before-after' ? '#fff' : 'transparent', fontWeight: selectedTab === 'before-after' ? 500 : 'normal', borderTopLeftRadius: '5px', borderTopRightRadius: '5px'}}
                             onClick={() => handleTabClick('before-after')}
                         >
-                            <span style={{ padding: '0 10px 6px 10px', height: '100%', display: 'inline-block' }}>Before After</span>
+                            <span style={{ padding: '0 0 6px 0', height: '100%', display: 'inline-block' }}>Before After</span>
                         </Nav.Link>
                     </Nav>
-                    <div className='container w-100 textBoxParentContainer' style={{ ...textBoxParentContainer, display: 'flex', flexDirection: 'column', background: '#fff', borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px', paddingTop: '8px', paddingBottom: '8px' }}>
+                    <div className='container w-100 textBoxParentContainer' style={{ ...textBoxParentContainer, display: 'flex', flexDirection: 'column', background: '#fff', borderBottomLeftRadius: '5px', borderTopRightRadius: '5px', borderBottomRightRadius: '5px', paddingTop: '8px', paddingBottom: '8px' }}>
                         <Form onSubmit={handleSearchSubmit}>
-                            <label htmlFor="keyword" style={{ ...labelStyle, marginBottom: '5px' }}>Keyword</label>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div className='w-100 ps-3 pt-2'>
+                                <label htmlFor="keyword" style={{ ...labelStyle, marginBottom: '5px', fontSize: '18px' }}>Keyword</label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Type your keyword here..."
                                     value={searchQuery}
                                     onChange={handleSearchChange}
-                                    style={{ ...inputStyle, marginBottom: '5px' }}
-                                />
-                                <button type='submit' style={{ ...buttonStyle, background: '#6C67E1', height: '40px', alignSelf: 'center', marginLeft: '10px' }}>Search Mockup</button>
+                                    style={{ ...inputStyle, marginBottom: '5px', padding: '5px 0' }}
+                                />  
+                                </div>                              
+                                <button type='submit' style={{ ...buttonStyle, background: '#6C67E1', height: '58px', alignSelf: 'center', padding: '5px 15px', marginLeft: '10px', whiteSpace: 'nowrap', fontSize: '18px' }}>Search Mockup</button>
                             </div>
                         </Form>
                     </div>
