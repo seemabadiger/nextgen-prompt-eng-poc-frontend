@@ -33,7 +33,7 @@ const generatePdf = async (mockups) => {
         
         <!-- Title and Tags in Same Line -->
         <div style="display: flex; align-items: center; margin-top: 10px;">
-            <h1 style="font-weight: bold; font-size: 1.8em; color: #333; margin: 0;">${mockup.title}</h1>
+            <h1 style="font-weight: bold; font-size: 1.8em; color: #333; margin: 0 10 0 0;">${mockup.title}</h1>
             <div style="display: flex; gap: 10px;">
              ${mockup.tags.map(tag => `<div style="background-color: #f0f0f0; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 0.9em;">${tag}</div>`).join('')}
             </div>
