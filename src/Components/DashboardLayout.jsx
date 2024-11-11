@@ -8,6 +8,7 @@ import UploadMockupModal from './UploadMockupModal';
 import NavbarComponent from './Navbar';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { AuthContext } from '../Context/AuthContext';
+import generatePdf from '../utils/htmlToPdf';
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
@@ -25,6 +26,7 @@ const DashboardLayout = () => {
     Image: ''
   });
   const [selectedMockups, setSelectedMockups] = useState([]);
+  const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState([]);
   const [activeButton, setActiveButton] = useState('');
   const navigate = useNavigate(); // Use useNavigate hook
 
@@ -206,13 +208,19 @@ const DashboardLayout = () => {
 
   const handleCheckboxChange = (e, mockupId) => {
     e.stopPropagation(); // Stop event propagation to prevent card click
+    let selected = [];
     setSelectedMockups(prevSelected => {
       if (prevSelected.includes(mockupId)) {
-        return prevSelected.filter(id => id !== mockupId);
+        const mockupIds = prevSelected.filter(id => id !== mockupId);
+        selected = mockups.filter(mockup => mockupIds.includes(mockup.id));
+        return mockupIds
       } else {
-        return [...prevSelected, mockupId];
+        const mockupIds = [...prevSelected, mockupId];
+        selected = mockups.filter(mockup => mockupIds.includes(mockup.id));
+        return mockupIds;
       }
     });
+    setSelectedMockupsForDownload(selected);
   };
 
   const handleCarouselClick = (e) => {
@@ -241,7 +249,7 @@ const DashboardLayout = () => {
             ))}
           </div>
           <div className="d-flex align-items-center">
-            <Button variant="outline-secondary" className="me-2 d-flex align-items-center">
+            <Button variant="outline-secondary" className="me-2 d-flex align-items-center" onClick={() => generatePdf(selectedMockupsForDownload)}>
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
             </Button>
