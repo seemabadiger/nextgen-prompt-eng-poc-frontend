@@ -5,7 +5,7 @@ import DashboardLayout from '../Components/DashboardLayout';
 
 const Dashboard = () => {
   return (
-    <div className='container-fluid'>
+    <div className='container-fluid px-0'>
       <DashboardLayout />
     </div>
   );

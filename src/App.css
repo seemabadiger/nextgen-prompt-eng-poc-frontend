@@ -143,9 +143,17 @@ opacity: 1;
   opacity: 1;
   border: none !important;
   pointer-events: auto;
-  border-radius: 14px; /* Add this line to round the corners */
+  border-radius: 14px !important; /* Add this line to round the corners */
+  overflow: hidden;
 }
-
+.template-card .badge.bg-secondary {
+  background-color: #EEEEEE !important;
+  padding: 10px;
+  border-radius: 5px;
+  color: #4A4A4A;
+  font-size: 14px;
+  font-weight: normal;
+}
 .template-card .template-img{
   border-radius: 14px 14px 0px 0px;
   opacity: 0.91;
