@@ -5,7 +5,7 @@ import axios from 'axios';
 import { AuthContext } from '../Context/AuthContext';
 import Logo from '../assets/logo.svg';
 import Avatar from '../assets/avatar.png';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const NavbarComponent = ({ setMockups, showModal }) => {
     const { user, logout } = useContext(AuthContext);
@@ -16,16 +16,18 @@ const NavbarComponent = ({ setMockups, showModal }) => {
         setSelectedTab(tab);
     };
 
+    const navigate = useNavigate();
+
     const handleLogout = async () => {
         await logout();
-        <Navigate to="/" />;
+        navigate('/');
     };
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         const url = searchQuery
       ? `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`
-      : `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user?.id}/mockups`;
+            : `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user?.id}/mockups`;
         axios.get(url)
           .then(response => {
             const searchResults = response.data.map(mockup => ({
@@ -63,7 +65,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => showModal(!0)} style={{ ...buttonStyle, background: 'transparent', color: '#fff', border: 'none' }}>Upload Mockup</button>
                     <NavDropdown title={<span>{user?.name} <img src={Avatar} alt="Avatar" style={{ width: '30px', height: '30px', borderRadius: '50%', marginLeft: '10px' }} /></span>} id="user-menu-dropdown" style={{ ...buttonStyle, background: 'transparent', color: '#fff', border: 'none' }}>
-                        <NavDropdown.Item href="#logout" onClick={handleLogout}>Logout</NavDropdown.Item>
+                        <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
                     </NavDropdown>
                 </div>
             </div>
@@ -118,6 +120,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                 </div>
             </Navbar.Collapse>
         </Navbar>
+        
     );
 };
 
