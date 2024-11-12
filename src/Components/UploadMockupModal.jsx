@@ -10,6 +10,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
   const { user } = useContext(AuthContext);
   const [mockups, setMockups] = useState([]);
   const [fields, setFields] = useState({
+    mockuptype: '',
     title: '',
     domain: '',
     subdomain: '',
@@ -106,7 +107,8 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
       mockups.forEach((mockup, index) => {
         formData.append('MockupFiles', mockup);
       });
-        formData.append('ProjectTitle', fields.title);
+      formData.append('MockupType', fields.mockuptype);
+      formData.append('ProjectTitle', fields.title);
       formData.append('DomainName', fields.domain );
       formData.append('SubdomainName', fields.subdomain);
       formData.append(`ImageGroupId`, '');
@@ -128,7 +130,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
 
     } catch (error) {
     console.error('Error uploading files:', error);
-     // alert('An error occurred while uploading the files.');
+    //  alert('An error occurred while uploading the files.');
     }
     handleClose();
   };
@@ -153,6 +155,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
   useEffect(() => {
     if (show) {
       setFields({
+        mockuptype: '',
         title: '',
         domain: '',
         subdomain: '',
@@ -170,6 +173,53 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
         <Modal.Title>Add New Mock-up</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+      <Form.Group className="mb-4">
+          <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>
+            SELECT SECTION
+          </Form.Label>
+          <div className="d-flex gap-4">
+            <Form.Check
+              type="radio"
+              id="visual-samples"
+              label="Visual Samples"
+              name="mockuptype"
+              value="Visual Samples"
+              checked={fields.mockuptype === 'Visual Samples'}
+              onChange={handleChange}
+              className="me-3"
+            />
+            <Form.Check
+              type="radio"
+              id="case-studies"
+              label="Case Studies"
+              name="mockuptype"
+              value="Case Studies"
+              checked={fields.mockuptype === 'Case Studies'}
+              onChange={handleChange}
+              className="me-3"
+            />
+            <Form.Check
+              type="radio"
+              id="process-diagram"
+              label="Process Diagram & Artifacts"
+              name="mockuptype"
+              value="Process Diagram & Artifacts"
+              checked={fields.mockuptype === 'Process Diagram & Artifacts'}
+              onChange={handleChange}
+              className="me-3"
+            />
+            <Form.Check
+              type="radio"
+              id="before-after"
+              label="Before After"
+              name="mockuptype"
+              value="Before After"
+              checked={fields.mockuptype === 'Before After'}
+              onChange={handleChange}
+            />
+          </div>
+        </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label className="project-title-label" style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>PROJECT TITLE</Form.Label>
           <Form.Control
