@@ -4,6 +4,7 @@ import HeaderBackground from "../assets/header-bg.png";
 import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 import Logo from "../assets/logo.svg";
+import HarbingerLogo from "../assets/harbinger_logo.svg";
 import UploadLogo from "../assets/upload_logo.svg";
 import Avatar from "../assets/avatar.png";
 import { Navigate } from "react-router-dom";
@@ -93,8 +94,21 @@ const NavbarComponent = ({ setMockups, showModal }) => {
             src={Logo}
             width="136"
             height="89"
-            className="d-inline-block align-top"
+            className="d-inline-block align-top navbar-logo"
             alt="Logo"
+          />
+          <div className="logo-divider"></div>
+          <span
+            style={{ color: "#fff", fontSize: "12px", marginBottom: "35px" }}
+          >
+            By
+          </span>
+          <img
+            src={HarbingerLogo}
+            width="148"
+            height="48"
+            className="d-inline-block align-top"
+            alt="Harbinger Logo"
           />
         </Navbar.Brand>
         <div style={{ display: "flex", gap: "10px" }}>
@@ -110,17 +124,20 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                 textDecoration: "underline",
                 borderRadius: "0",
                 fontWeight: "bold",
-                paddingRight: "20px",
+                padding: "0px 20px 5px 10px",
               }}
             >
               <img
+                style={{
+                  marginRight: "5px",
+                }}
                 src={UploadLogo}
                 width="20"
                 height="20"
                 className="d-inline-block "
                 alt="Upload Logo"
               />{" "}
-              Upload Mockup
+              Upload
             </button>
           )}
           <NavDropdown
