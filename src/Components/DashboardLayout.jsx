@@ -292,7 +292,7 @@ const DashboardLayout = () => {
   return (
     <div>
       <NavbarComponent setMockups={setMockups} showModal={handleShow} />
-      <Container style={{ marginTop: '60px' }}>
+      {/* <Container style={{ marginTop: '60px' }}>
         <div className="d-flex justify-content-between align-items-center mb-4 mt-3 inner-tabs">
           <div className="d-flex flex-wrap">
             {['All', 'Mobile', 'Moodle', 'WordPress', 'Analytics', 'HRTech', 'EdTech', 'HealthTech'].map(domain => (
@@ -384,7 +384,7 @@ const DashboardLayout = () => {
             ))}
           </Row>
         )}
-      </Container>
+      </Container> */}
       <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} />
     </div>
   );

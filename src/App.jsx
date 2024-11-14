@@ -12,6 +12,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import ErrorBoundary from './Context/ErrorBoundry';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MockupDetailsPage from './Components/MockupDetailsPage';
+import ProcessDiagram from './pages/ProcessDiagram';
+import CaseStudies from './pages/CaseStudies';
+import BeforeAfter from './pages/BeforeAfter';
 
 
 const App = () => {
@@ -24,6 +27,9 @@ const App = () => {
           <Route>
 
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/caseStudies" element={<CaseStudies />} />
+          <Route path="/processDiagram" element={<ProcessDiagram />} />
+          <Route path="/beforeAfter" element={<BeforeAfter />} />
           </Route>
 
 
