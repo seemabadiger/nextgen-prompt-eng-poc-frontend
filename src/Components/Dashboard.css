@@ -205,6 +205,15 @@
   color: white !important;
 }
 
+
+.logo-divider {
+  height: 34px;
+  margin: 0 20px 0 20px;
+
+  width: 1px;
+  background-color: #e13844;
+}
+
 @media (max-width: 1199px) {
   .filters-toolbar {
     flex-direction: column;

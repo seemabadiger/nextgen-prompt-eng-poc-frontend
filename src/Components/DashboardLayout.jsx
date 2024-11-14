@@ -246,7 +246,7 @@ const DashboardLayout = () => {
 
     setIsLoadingFavorites(true);
     try {
-      const response = await axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`);
+      const response = await axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
       const favoriteIds = response.data.map(favorite => favorite.mockupGroupId);
       setFavorites(favoriteIds);
     } catch (error) {
@@ -321,7 +321,7 @@ const DashboardLayout = () => {
             )}
 
             {user?.role === 'Admin' && (
-              <Button variant="outline-secondary" className="me-2 d-flex align-items-center">
+              <Button variant="outline-secondary" className="me-2 d-flex align-items-center" onClick={() => generatePdf(selectedMockupsForDownload)}>
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
             </Button>
