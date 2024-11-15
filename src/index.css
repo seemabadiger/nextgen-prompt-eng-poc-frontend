@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+
 body {
     margin: 0;
     /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; */
@@ -44,7 +45,8 @@ code {
 }
 
 .carousel {
-    pointer-events: auto; /* Prevent carousel from handling pointer events */
+    pointer-events: auto;
+    /* Prevent carousel from handling pointer events */
 }
 
 .carousel-indicators .active {
@@ -62,13 +64,15 @@ code {
     margin: 0 5px;
 }
 
-    .carousel-indicator.active {
-        background: #007bff;
-    }
+.carousel-indicator.active {
+    background: #007bff;
+}
 
 .carousel-thumbnail {
-    width: 250px; /* Adjust the width as needed */
-    height: 140px; /* Adjust the height as needed */
+    width: 250px;
+    /* Adjust the width as needed */
+    height: 140px;
+    /* Adjust the height as needed */
     margin: 0 5px;
     cursor: pointer;
     border: 2px solid transparent;
@@ -76,11 +80,11 @@ code {
     object-fit: cover;
 }
 
-    .carousel-thumbnail.active {
-        border: 2px solid #007bff;
-    }
+.carousel-thumbnail.active {
+    border: 2px solid #007bff;
+}
 
-.inner-tabs button{
+.inner-tabs button {
     background-color: #ffffff;
     border: 1px solid #E1E1E1;
     border-radius: 5px;
@@ -88,13 +92,16 @@ code {
     height: 51px;
     padding: 0 16px;
 }
+
 .purpal-clr {
     color: #6C67E1;
 }
+
 .main-nav-tab .nav-link {
-    padding: 10px 30px 3px 30px !important;
+    padding: 10px 30px 1px 30px !important;
 }
-.main-nav-tab .nav-link.active:after{
+
+.main-nav-tab .nav-link.active:after {
     content: '';
     display: block;
     height: 2px;

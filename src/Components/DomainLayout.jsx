@@ -21,7 +21,9 @@ import {
 const DomainLayout = () => {
   const { user } = useContext(AuthContext);
   const [selectedMockups, setSelectedMockups] = useState([]);
-  const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState([]);
+  const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState(
+    []
+  );
 
   const [activeButton, setActiveButton] = useState("");
   const [favorites, setFavorites] = useState([]);
@@ -31,7 +33,7 @@ const DomainLayout = () => {
   const [mockups, setMockups] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const navigate = useNavigate(); // Use useNavigate hook
-  console.log("user===", user)
+  console.log("user===", user);
   const fetchMockups = (userId) => {
     axios
       .get(
@@ -254,7 +256,7 @@ const DomainLayout = () => {
   };
 
   return (
-    <Container style={{ marginTop: "60px" }}>
+    <Container className="p-0">
       <div className="d-flex justify-content-between align-items-center mb-4 mt-3 inner-tabs">
         <div className="d-flex flex-wrap">
           {[
@@ -374,7 +376,6 @@ const DomainLayout = () => {
           ))}
         </Row>
       )}
-      
     </Container>
   );
 };

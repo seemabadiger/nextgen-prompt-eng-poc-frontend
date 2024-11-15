@@ -34,6 +34,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
         backgroundImage: `url(${HeaderBackground})`,
         padding: "9px 0 0 0",
         flexDirection: "column",
+        height: "254px",
       }}
     >
       <div
@@ -172,6 +173,8 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                       selectedTab === "visual-samples" ? 500 : "normal",
                     borderTopLeftRadius: "5px",
                     borderTopRightRadius: "5px",
+                    borderBottomLeftRadius: "0px",
+                    borderBottomRightRadius: "0px",
                   }}
                   onClick={() => handleTabClick("visual-samples")}
                 >
@@ -180,6 +183,8 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                       padding: "0 0 6px 0",
                       height: "100%",
                       display: "inline-block",
+                      borderBottomLeftRadius: "0px",
+                      borderBottomRightRadius: "0px",
                     }}
                   >
                     Visual Samples
@@ -198,6 +203,8 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                     fontWeight: selectedTab === "case-studies" ? 500 : "normal",
                     borderTopLeftRadius: "5px",
                     borderTopRightRadius: "5px",
+                    borderBottomLeftRadius: "0px",
+                    borderBottomRightRadius: "0px",
                   }}
                   onClick={() => handleTabClick("case-studies")}
                 >
@@ -225,12 +232,14 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                     selectedTab === "process-diagram" ? 500 : "normal",
                   borderTopLeftRadius: "5px",
                   borderTopRightRadius: "5px",
+                  borderBottomLeftRadius: "0px",
+                  borderBottomRightRadius: "0px",
                 }}
                 onClick={() => handleTabClick("process-diagram")}
               >
                 <span
                   style={{
-                    padding: "0 0 6px 0",
+                    padding: "0 0 5px 0",
                     height: "100%",
                     display: "inline-block",
                   }}
@@ -250,6 +259,8 @@ const NavbarComponent = ({ setMockups, showModal }) => {
                     fontWeight: selectedTab === "before-after" ? 500 : "normal",
                     borderTopLeftRadius: "5px",
                     borderTopRightRadius: "5px",
+                    borderBottomLeftRadius: "0px",
+                    borderBottomRightRadius: "0px",
                   }}
                   onClick={() => handleTabClick("before-after")}
                 >
