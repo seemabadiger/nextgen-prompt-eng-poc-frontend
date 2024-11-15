@@ -36,7 +36,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
       return;
     }
     setEmptySearchQuery(false);
-    const url = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
+    const url = `https://localhost:7231/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
     axios
       .get(url)
       .then((response) => {
