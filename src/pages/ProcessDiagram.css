@@ -192,7 +192,16 @@
     border-bottom: 10px solid transparent;
 }
 
+a.link-text {
+  color: inherit;              /* Inherits color from parent text */
+  cursor: pointer;            /* Makes it clickable */
+  text-decoration: none;  /* Keep underline on hover */
+}
 
+a.link-text:hover {
+  color: inherit;              /* Ensure the hover color stays the same as the text */
+  text-decoration: underline;  /* Keep underline on hover */
+}
 
 
 @media (max-width: 991px) {

@@ -12,6 +12,33 @@ import DesignCard from "../assets/design-border.svg";
 import DevelopCard from "../assets/develop-border.svg";
 
 const ProcessDiagram = () => {
+  const deliverables = [
+    {
+      label: "Empathy Mapping",
+      link: "https://example.com/empathy-mapping",
+      file: "https://example.com/file1.pdf",
+    },
+    {
+      label: "Journey Mapping",
+      link: "https://example.com/journey-mapping",
+      file: "",
+    },
+    {
+      label: "Task Flow",
+      link: "",
+      file: "https://example.com/file2.pdf",
+    },
+    // Add more items as needed
+  ];
+
+  const handleClick = (link, file) => {
+    if (link) {
+      window.open(link, "_blank"); // Open the link in a new tab
+    } else if (file) {
+      window.open(file, "_blank"); // Open the file in a new tab
+    }
+  };
+
   return (
     <div className="container product-experience-design">
       <h1 className="process-dig-title ">Product Experience Design</h1>
@@ -40,8 +67,21 @@ const ProcessDiagram = () => {
               <span className="title">Deliverables</span>
               <div className="deliverables mt-1 red-border">
                 <p>
-                  Empathy Mapping, Journey Mapping, Task Flow, Personas,
-                  Scenarios, Heuristic Evaluation, Competitor Analysis.
+                  {deliverables.map((item, index) => (
+                    <span key={index}>
+                      <a
+                        href="#"
+                        className="link-text"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleClick(item.link, item.file);
+                        }}
+                      >
+                        {item.label}
+                      </a>
+                      {index < deliverables.length - 1 && ", "}{" "}
+                    </span>
+                  ))}
                 </p>
               </div>
               <img
