@@ -271,6 +271,9 @@ const DomainLayout = () => {
             "HealthTech",
           ].map((domain) => (
             <Button
+              style={{
+                marginBottom: "10px",
+              }}
               key={domain}
               variant="outline-secondary"
               className={`me-2 ${

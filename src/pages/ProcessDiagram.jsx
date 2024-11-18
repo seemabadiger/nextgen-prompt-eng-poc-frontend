@@ -2,9 +2,10 @@ import React, { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import { Navigate } from "react-router-dom";
 import "./ProcessDiagram.css";
-import DiscoverImg from "../assets/circle-image.svg";
-import DevelopImg from "../assets/develop-circle.svg";
-import DefineImg from "../assets/define-circle.svg";
+import DesignImg from "../assets/design-circle-b.svg";
+import DiscoverImg from "../assets/discover-circle-b.svg";
+import DevelopImg from "../assets/develop-circle-b.svg";
+import DefineImg from "../assets/define-circle-b.svg";
 import StackholderImg from "../assets/bottom-stackholder-section.svg";
 import DiscoverBorder from "../assets/discover-border.svg";
 import DefineCard from "../assets/define-border.svg";
@@ -43,9 +44,9 @@ const ProcessDiagram = () => {
     <div className="container product-experience-design">
       <h1 className="process-dig-title ">Product Experience Design</h1>
       <div className="border-div mb-3"></div>
-      <div className="row justify-content-between p-2 w-100">
+      <div className="row justify-content-between   w-100">
         {/* Stage 1 - Discover */}
-        <div className="col-sm-6 col-md-6 col-lg-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3 padding-10  ">
           <div className="card-flex">
             <img
               src={DiscoverBorder}
@@ -54,7 +55,7 @@ const ProcessDiagram = () => {
                 marginTop: "30px",
               }}
             />
-            <div className="stage stage-1 p-2 rounded position-relative">
+            <div className="stage stage-1   rounded position-relative">
               {/* <div className="stage-number">1</div> */}
               {/* <h2 className="stage-title">Discover</h2> */}
 
@@ -88,9 +89,9 @@ const ProcessDiagram = () => {
                 src={DiscoverImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-22px",
+                  marginLeft: "-18px",
                   width: "200px",
-                  marginTop: "20px",
+                  marginTop: "10px",
                 }}
               />
               {/* <div className="stage-icon">
@@ -99,7 +100,7 @@ const ProcessDiagram = () => {
               {/* <div className="evaluation mt-3">Stakeholder Evaluation</div> */}
             </div>
           </div>
-          {/* <div className="stage stage-1 p-2 rounded position-relative">
+          {/* <div className="stage stage-1   rounded position-relative">
             <div className="stage-number">1</div>
             <h2 className="stage-title">Discover</h2>
 
@@ -129,7 +130,7 @@ const ProcessDiagram = () => {
         </div>
 
         {/* Stage 2 - Define */}
-        <div className="col-sm-6 col-md-6 col-lg-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3 padding-10  ">
           <div className="card-flex">
             <img
               src={DefineCard}
@@ -138,7 +139,7 @@ const ProcessDiagram = () => {
                 marginTop: "30px",
               }}
             />
-            <div className="stage stage-2 p-2 rounded position-relative">
+            <div className="stage stage-2   rounded position-relative">
               {/* <h2 className="stage-title">Define</h2> */}
               <ul className="list-data mt-3">
                 <li>Defining the Problem</li>
@@ -156,9 +157,9 @@ const ProcessDiagram = () => {
                 src={DefineImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-22px",
+                  marginLeft: "-45px",
                   width: "200px",
-                  marginTop: "20px",
+                  marginTop: "10px",
                 }}
               />
               {/* <div className="stage-icon">
@@ -172,7 +173,7 @@ const ProcessDiagram = () => {
         </div>
 
         {/* Stage 3 - Design */}
-        <div className="col-sm-6 col-md-6 col-lg-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3 padding-10  ">
           <div className="card-flex">
             <img
               src={DesignCard}
@@ -181,7 +182,7 @@ const ProcessDiagram = () => {
                 marginTop: "30px",
               }}
             />
-            <div className="stage stage-3 p-2 rounded position-relative">
+            <div className="stage stage-3   rounded position-relative">
               {/* <div className="stage-number">3</div> */}
               {/* <h2 className="stage-title">Design</h2> */}
               <ul className="list-data mt-3 list-pd">
@@ -196,12 +197,12 @@ const ProcessDiagram = () => {
                 </p>
               </div>
               <img
-                src={DiscoverImg}
+                src={DesignImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-22px",
+                  marginLeft: "-42px",
                   width: "200px",
-                  marginTop: "20px",
+                  marginTop: "10px",
                 }}
               />
               {/* <div className="stage-icon">
@@ -215,7 +216,7 @@ const ProcessDiagram = () => {
         </div>
 
         {/* Stage 4 - Develop */}
-        <div className="col-sm-6 col-md-6 col-lg-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3 padding-10  ">
           <div className="card-flex">
             <img
               src={DevelopCard}
@@ -224,7 +225,7 @@ const ProcessDiagram = () => {
                 marginTop: "30px",
               }}
             />
-            <div className="stage stage-4 p-2 rounded position-relative">
+            <div className="stage stage-4   rounded position-relative">
               {/* <div className="stage-number">4</div>
             <h2 className="stage-title">Develop</h2> */}
               <ul className="list-data mt-3">
@@ -247,9 +248,9 @@ const ProcessDiagram = () => {
                 src={DevelopImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-22px",
+                  marginLeft: "-38px",
                   width: "200px",
-                  marginTop: "20px",
+                  marginTop: "10px",
                 }}
               />
 
