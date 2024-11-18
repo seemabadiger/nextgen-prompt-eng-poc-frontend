@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import generatePdf from '../utils/htmlToPdf';
 
 import {
   Container,
@@ -298,6 +299,7 @@ const DomainLayout = () => {
             <Button
               variant="outline-secondary"
               className="me-2 d-flex align-items-center"
+              onClick={() => generatePdf(selectedMockupsForDownload)}
             >
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
