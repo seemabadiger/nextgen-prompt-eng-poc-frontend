@@ -50,7 +50,7 @@ const DashboardLayout = () => {
   }, [sortOption]);
 
   const fetchMockups = (userId) => {
-    axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`)
+    axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`)
       .then(response => {
         const fetchedMockups = response.data.map(mockup => ({
           id: mockup.id,
@@ -91,9 +91,9 @@ const DashboardLayout = () => {
     setSortOption(sort);
     let apiUrl;
     if (sort === 'Alphabetically') {
-      apiUrl = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
+      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
     } else {
-      apiUrl = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
+      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
     }
 
     axios.get(apiUrl)
@@ -118,7 +118,7 @@ const DashboardLayout = () => {
   const handleDomainFilter = (domainName) => {
     setActiveButton(domainName);
     setShowFavorites(false); // Reset showFavorites state
-    axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`)
+    axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`)
       .then(response => {
         const filteredMockups = response.data.map(mockup => ({
           id: mockup.id,
@@ -140,7 +140,7 @@ const DashboardLayout = () => {
   };
 
   const handleDelete = (mockup) => {
-    axios.delete(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`)
+    axios.delete(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`)
       .then(() => {
         setMockups(prevMockups => prevMockups.filter(item => item.id !== mockup.id));
         console.log('Mockup deleted successfully');
@@ -195,7 +195,7 @@ const DashboardLayout = () => {
     formData.append('Image', updateForm.Image);
 
     if (selectedMockup) {
-      axios.put(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/update/${selectedMockup.id}`, formData, {
+      axios.put(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/update/${selectedMockup.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -246,7 +246,7 @@ const DashboardLayout = () => {
 
     setIsLoadingFavorites(true);
     try {
-      const response = await axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
+      const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
       const favoriteIds = response.data.map(favorite => favorite.mockupGroupId);
       setFavorites(favoriteIds);
     } catch (error) {
@@ -262,7 +262,7 @@ const DashboardLayout = () => {
 
     try {
       // Add to favorites with true as payload
-      await axios.post(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/like/${mockupId}`, true, {
+      await axios.post(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/like/${mockupId}`, true, {
         headers: {
           'Content-Type': 'application/json'
         }
