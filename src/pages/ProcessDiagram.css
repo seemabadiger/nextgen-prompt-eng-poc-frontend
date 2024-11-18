@@ -8,6 +8,10 @@
     width: 100%;
 }
 
+.padding-10 {
+    padding: 15px 10px;
+}
+
 .card-flex {
     display: flex;
 }
@@ -52,9 +56,9 @@
 
 .stage {
     /* background-color: #f8f9fa; */
-    padding: 30px 20px;
     border-left: 5px solid;
     position: relative;
+    padding: 15px 0px 15px 8px;
 }
 
 .stage-1, .stage-2, .stage-3, .stage-4 {
@@ -192,6 +196,11 @@
     border-bottom: 10px solid transparent;
 }
 
+@media (max-width: 991px) {
+    .container {
+        max-width: 740px !important;
+    }
+}
 
 
 

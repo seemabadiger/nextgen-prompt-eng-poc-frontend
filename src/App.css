@@ -197,7 +197,7 @@
   border-bottom-right-radius: 10px;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 992px) and (max-width: 1165px) {
   .container {
     max-width: 1080px !important;
   }
