@@ -191,3 +191,13 @@
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
 }
+
+
+
+
+@media (max-width: 991px) {
+    .navbar-expand-lg {
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+    }
+}

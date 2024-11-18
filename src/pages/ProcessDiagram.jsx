@@ -18,7 +18,7 @@ const ProcessDiagram = () => {
       <div className="border-div mb-3"></div>
       <div className="row justify-content-between p-2 w-100">
         {/* Stage 1 - Discover */}
-        <div className="col-md-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3  ">
           <div className="card-flex">
             <img
               src={DiscoverBorder}
@@ -89,7 +89,7 @@ const ProcessDiagram = () => {
         </div>
 
         {/* Stage 2 - Define */}
-        <div className="col-md-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3  ">
           <div className="card-flex">
             <img
               src={DefineCard}
@@ -132,7 +132,7 @@ const ProcessDiagram = () => {
         </div>
 
         {/* Stage 3 - Design */}
-        <div className="col-md-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3  ">
           <div className="card-flex">
             <img
               src={DesignCard}
@@ -175,7 +175,7 @@ const ProcessDiagram = () => {
         </div>
 
         {/* Stage 4 - Develop */}
-        <div className="col-md-3  ">
+        <div className="col-sm-6 col-md-6 col-lg-3  ">
           <div className="card-flex">
             <img
               src={DevelopCard}
