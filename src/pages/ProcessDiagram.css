@@ -196,13 +196,22 @@
     border-bottom: 10px solid transparent;
 }
 
+a.link-text {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+a.link-text:hover {
+    color: inherit;
+    text-decoration: underline;
+}
+
 @media (max-width: 991px) {
     .container {
         max-width: 740px !important;
     }
 }
-
-
 
 @media (max-width: 991px) {
     .navbar-expand-lg {

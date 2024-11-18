@@ -24,7 +24,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
   useEffect(() => {
     const fetchMockups = async () => {
       try {
-        const response = await axios.get(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
+        const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
         //setMockups(response.data);
       } catch (error) {
         console.error('Error fetching mockups:', error);
@@ -117,7 +117,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
           formData.append(`Tags`, tag);
         });
 
-      await axios.post(`https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/upload?userId=${user.id}`, formData, {
+      await axios.post(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/upload?userId=${user.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

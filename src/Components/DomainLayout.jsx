@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import generatePdf from '../utils/htmlToPdf';
 
 import {
   Container,
@@ -37,7 +38,7 @@ const DomainLayout = () => {
   const fetchMockups = (userId) => {
     axios
       .get(
-        `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`
       )
       .then((response) => {
         const fetchedMockups = response.data.map((mockup) => ({
@@ -63,7 +64,7 @@ const DomainLayout = () => {
     setIsLoadingFavorites(true);
     try {
       const response = await axios.get(
-        `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`
       );
       const favoriteIds = response.data.map(
         (favorite) => favorite.mockupGroupId
@@ -108,7 +109,7 @@ const DomainLayout = () => {
     try {
       // Add to favorites with true as payload
       await axios.post(
-        `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/${user.id}/like/${mockupId}`,
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/like/${mockupId}`,
         true,
         {
           headers: {
@@ -135,7 +136,7 @@ const DomainLayout = () => {
     setShowFavorites(false); // Reset showFavorites state
     axios
       .get(
-        `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`
       )
       .then((response) => {
         const filteredMockups = response.data.map((mockup) => ({
@@ -160,7 +161,7 @@ const DomainLayout = () => {
   // const handleDelete = (mockup) => {
   //   axios
   //     .delete(
-  //       `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`
+  //       `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`
   //     )
   //     .then(() => {
   //       setMockups((prevMockups) =>
@@ -197,9 +198,9 @@ const DomainLayout = () => {
     setSortOption(sort);
     let apiUrl;
     if (sort === "Alphabetically") {
-      apiUrl = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
+      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
     } else {
-      apiUrl = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
+      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
     }
 
     axios
@@ -301,6 +302,7 @@ const DomainLayout = () => {
             <Button
               variant="outline-secondary"
               className="me-2 d-flex align-items-center"
+              onClick={() => generatePdf(selectedMockupsForDownload)}
             >
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
