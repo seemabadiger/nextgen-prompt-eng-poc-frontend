@@ -20,7 +20,7 @@ const useAuth = () => {
   const login = async (email, password) => {
     try {
       const UserName = email;
-      const response = await axios.post('https://hxstudioauth.azurewebsites.net/api/auth/login', { UserName, password });
+      const response = await axios.post('https://hxstudioauthv1.azurewebsites.net/api/auth/login', { UserName, password });
       if (response.data.isSuccess) {
         const { token, user } = response.data.result;
         setCookie('token', token, { path: '/' });

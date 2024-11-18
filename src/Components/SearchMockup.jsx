@@ -20,7 +20,7 @@ const SearchMockup = ({ setMockups }) => {
       return;
     }
     setEmptySearchQuery(false);
-    const url = `https://hxstudiofileupload.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
+    const url = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
     axios
       .get(url)
       .then((response) => {
