@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Container, Carousel, Row, Col, Button } from 'react-bootstrap';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Container, Carousel, Row, Col, Button, Modal } from 'react-bootstrap';
 import HeaderComponent from './HeaderComponent';
 import leftImg from '../assets/left.svg';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete"; // Import delete icon
+import axios from 'axios';
 
 const MockupDetailsPage = () => {
     const { state } = useLocation();
+    const navigate = useNavigate(); // Initialize navigate
     const { mockup } = state;
     const [activeIndex, setActiveIndex] = useState(0);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
 
     if (!mockup) return <div>Mockup not found</div>;
 
@@ -28,11 +33,34 @@ const MockupDetailsPage = () => {
         console.log('Edit clicked for mockup:', mockup.id);
     };
 
-    const handleDelete = () => {
-        // Implement delete functionality
-        console.log('Delete clicked for mockup:', mockup.id);
-        // Add actual delete logic here, such as API call or state management
+    const confirmDelete = () => {
+        setShowDeleteModal(true);
+        setDeleteError('');
     };
+
+    const handleDelete = async () => {
+        setIsDeleting(true);
+        setDeleteError('');
+        try {
+            const response = await axios.delete(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`);
+            
+            if (response.status === 200) {
+                setShowDeleteModal(false);
+                // Navigate to domain layout
+                navigate('/', { replace: true });
+            }
+
+        } catch (error) {
+            console.error('Error deleting mockup:', error);
+            // alert('Failed to delete mockup. Please try again.');
+            setDeleteError('Failed to delete mockup. Please try again.');
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+        }
+    };
+
+    const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
     // Style for expanded view
     const expandedStyle = {
@@ -89,7 +117,7 @@ const MockupDetailsPage = () => {
                             <Button
                                 variant="outline-danger"
                                 size="sm"
-                                onClick={handleDelete}
+                                onClick={confirmDelete}
                                 className="p-1"
                             >
                                 <DeleteIcon fontSize="small" />
@@ -132,6 +160,27 @@ const MockupDetailsPage = () => {
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
                 </Col>
             </Row>
+
+            <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this mockup?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseDeleteModal}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        variant="danger" 
+                        onClick={handleDelete} 
+                        disabled={isDeleting}
+                    >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* Expanded Image View */}
             {isExpanded && (
