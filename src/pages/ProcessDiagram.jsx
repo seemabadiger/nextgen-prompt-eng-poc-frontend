@@ -132,7 +132,7 @@ const ProcessDiagram = () => {
                 src={DefineImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-45.5px",
+                  marginLeft: "-46px",
                   marginTop: "10px",
                 }}
               />
@@ -166,7 +166,7 @@ const ProcessDiagram = () => {
                 src={DesignImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-43px",
+                  marginLeft: "-42.6px",
                   marginTop: "10px",
                 }}
               />
