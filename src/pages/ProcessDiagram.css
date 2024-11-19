@@ -207,6 +207,33 @@ a.link-text:hover {
     text-decoration: underline;
 }
 
+#process-modal-footer {
+    justify-content: center;
+}
+
+.upload-icon {
+    fill: #6C67E1;
+}
+
+.upload-icon:disabled {
+    fill: #BCB8B8;
+}
+
+.modal-title-color {
+    color: #6E6E6E;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.form-check-input:checked {
+    background-color: #3EAF16;
+    border-color: #3EAF16;
+}
+
+.process-dig-upload-modal .modal-content {
+    padding: 0 20px 20px 20px;
+}
+
 @media (max-width: 991px) {
     .container {
         max-width: 740px !important;

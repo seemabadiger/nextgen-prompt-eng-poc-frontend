@@ -1,7 +1,7 @@
 import { CloudUpload, Link, Delete, Save } from "@mui/icons-material";
 import React, { useState } from "react";
 import { Form, Button, Modal, Row, Col } from "react-bootstrap";
-import './Dashboard.css';
+import "./Dashboard.css";
 
 const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -79,7 +79,12 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
   return (
     <>
       {/* Main Modal for Upload Form */}
-      <Modal show={show} onHide={handleClose} size="lg">
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="lg"
+        className="process-dig-upload-modal"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Upload</Modal.Title>
         </Modal.Header>
@@ -88,7 +93,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
             {/* Section 1: Page Selection */}
             <Form.Group>
               <Form.Label>
-                <h5>Select Section</h5>
+                <h5 className="modal-title-color">Select Section</h5>
               </Form.Label>
               <div className="d-flex gap-4">
                 {pages.map((page) => (
@@ -108,7 +113,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
             {/* Section 2: Process Selection */}
             <Form.Group className="mt-3">
               <Form.Label>
-                <h5>Select Process</h5>
+                <h5 className="modal-title-color">Select Process</h5>
               </Form.Label>
               <div className="d-flex gap-4">
                 {processes.map((process) => (
@@ -127,12 +132,12 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
 
             {/* Section 3: Upload Deliverables */}
             <div className="mt-3">
-              <h5>Upload Deliverables</h5>
+              <h5 className="modal-title-color my-3">Upload Deliverables</h5>
               {deliverables.map((deliverable) => (
                 <Row key={deliverable} className="mb-6">
                   {/* Deliverable Label */}
                   <div className="d-flex gap-10">
-                    <div>
+                    <div className="col-md-4 col-sm-8">
                       <Col md={12}>
                         <strong>{deliverable}</strong>
                       </Col>
@@ -182,7 +187,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
                     </div>
                     <div>
                       {/* Icons for File, Link, Save, and Delete */}
-                      <Col md={12} className="d-flex gap-3 mt-3">
+                      <Col md={12} className="d-flex gap-3 ">
                         {/* File Upload */}
                         <div>
                           <Form.Control
@@ -195,7 +200,10 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
                             htmlFor={`file-upload-${deliverable}`}
                             style={{ cursor: "pointer", color: "#6c757d" }}
                           >
-                            <CloudUpload style={{ fontSize: "1.8rem" }} />
+                            <CloudUpload
+                              className="upload-icon"
+                              style={{ fontSize: "1.8rem" }}
+                            />
                           </label>
                         </div>
 
@@ -217,7 +225,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
             </div>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer id="process-modal-footer">
           <Button
             variant="secondary"
             style={{ backgroundColor: "transparent", color: "#6E6E6E" }}
