@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import generatePdf from "../utils/htmlToPdf";
 
 import {
   Container,
@@ -62,7 +63,7 @@ const DomainLayout = () => {
     setIsLoadingFavorites(true);
     try {
       const response = await axios.get(
-        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/like`
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`
       );
       const favoriteIds = response.data.map(
         (favorite) => favorite.mockupGroupId
@@ -269,6 +270,9 @@ const DomainLayout = () => {
             "HealthTech",
           ].map((domain) => (
             <Button
+              style={{
+                marginBottom: "10px",
+              }}
               key={domain}
               variant="outline-secondary"
               className={`me-2 ${
@@ -297,6 +301,7 @@ const DomainLayout = () => {
             <Button
               variant="outline-secondary"
               className="me-2 d-flex align-items-center"
+              onClick={() => generatePdf(selectedMockupsForDownload)}
             >
               <GetAppIcon fontSize="small" className="me-2" />
               Create PDF
@@ -322,7 +327,7 @@ const DomainLayout = () => {
       ) : (
         <Row className="mt-4">
           {displayedMockups.map((mockup) => (
-            <Col sm={3} key={mockup.id} className="mb-3">
+            <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
               <Card
                 className="template-card"
                 onClick={() => handleCardClick(mockup)}

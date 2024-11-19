@@ -220,6 +220,20 @@
   margin-top: 1px;
 }
 
+.text-field.deactivated {
+  border: none;
+  background-color: transparent !important;
+  color: #6c757d; /* Light gray text */
+  cursor: not-allowed;
+  box-shadow: none; /* Remove inner shadow */
+  padding: 0;
+  margin: 0;
+}
+
+.text-field {
+  width: 100%;
+  color: #000;
+}
 
 @media (max-width: 1199px) {
   .filters-toolbar {

@@ -1,4 +1,4 @@
-.App{
+.App {
   background: transparent url('./assets/Mask Group 62.jpg') 0% 0% no-repeat padding-box;
   background-size: cover;
   display: flex;
@@ -21,7 +21,7 @@
   opacity: 1;
 }
 
-.login-container h1 {  
+.login-container h1 {
   margin-bottom: 20px;
   color: #333;
   font-size: 24px;
@@ -36,7 +36,8 @@
   border: 1px solid #ccc;
   width: 100%;
   background: #F5F5F5 0% 0% no-repeat padding-box;
-  box-sizing: border-box; /* Ensures the padding and border are included in the element's total width and height */
+  box-sizing: border-box;
+  /* Ensures the padding and border are included in the element's total width and height */
 }
 
 .login-container .btn-primary {
@@ -80,46 +81,47 @@
   box-shadow: none !important;
 }
 
-.logo{
+.logo {
   opacity: 1;
 }
 
-.login-text{
+.login-text {
   /* UI Properties */
-font: normal normal normal 18px/30px Cairo;
-letter-spacing: 0px;
-color: #202020;
-opacity: 1;
+  font: normal normal normal 18px/30px Cairo;
+  letter-spacing: 0px;
+  color: #202020;
+  opacity: 1;
 }
 
-.login-input{
- /* UI Properties */
-text-align: left;
-letter-spacing: 1px;
-color: #6E6E6E;
-opacity: 1;
+.login-input {
+  /* UI Properties */
+  text-align: left;
+  letter-spacing: 1px;
+  color: #6E6E6E;
+  opacity: 1;
 }
 
-.login-usertext{
+.login-usertext {
   background: #F5F5F5 0% 0% no-repeat padding-box;
-  opacity: 1;  
+  opacity: 1;
 }
 
 .login-button {
   border: none;
-  color: #fff; 
-   padding: 12px 24px;
+  color: #fff;
+  padding: 12px 24px;
   font-size: 16px;
   border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease; 
+  transition: background-color 0.3s ease;
   background: #6C67E1 0% 0% no-repeat padding-box;
   box-shadow: 0px 4px 8px #0000001F;
-   opacity: 1;  
+  opacity: 1;
 }
 
 .login-button:hover {
-  background-color: #6C67E1; /* Slightly darker purple on hover */
+  background-color: #6C67E1;
+  /* Slightly darker purple on hover */
 }
 
 .password-toggle-icon {
@@ -127,11 +129,13 @@ opacity: 1;
   right: 10px;
   top: 50%;
   cursor: pointer;
-  font-size: 1.2rem; /* Adjust the size of the icon if needed */
-  color: #6418C3; /* Eye icon color */
+  font-size: 1.2rem;
+  /* Adjust the size of the icon if needed */
+  color: #6418C3;
+  /* Eye icon color */
 }
 
-.login-usertext-password{
+.login-usertext-password {
   background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 2px dashed #6418C3;
   opacity: 1;
@@ -143,9 +147,11 @@ opacity: 1;
   opacity: 1;
   border: none !important;
   pointer-events: auto;
-  border-radius: 14px !important; /* Add this line to round the corners */
+  border-radius: 14px !important;
+  /* Add this line to round the corners */
   overflow: hidden;
 }
+
 .template-card .badge.bg-secondary {
   background-color: #EEEEEE !important;
   padding: 10px;
@@ -154,7 +160,8 @@ opacity: 1;
   font-size: 14px;
   font-weight: normal;
 }
-.template-card .template-img{
+
+.template-card .template-img {
   border-radius: 14px 14px 0px 0px;
   opacity: 0.91;
 }
@@ -188,4 +195,10 @@ opacity: 1;
 .ql-container {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+}
+
+@media (min-width: 992px) and (max-width: 1165px) {
+  .container {
+    max-width: 1080px !important;
+  }
 }

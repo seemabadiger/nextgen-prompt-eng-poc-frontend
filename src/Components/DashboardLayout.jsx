@@ -7,8 +7,8 @@ import UploadMockupModal from './UploadMockupModal';
 import NavbarComponent from './Navbar';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { AuthContext } from '../Context/AuthContext';
-import generatePdf from '../utils/htmlToPdf';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ProcessUploadModal from './ProcessDiagramUploadModal';
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
@@ -386,6 +386,7 @@ const DashboardLayout = () => {
         )}
       </Container> */}
       <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} />
+      {/* <ProcessUploadModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}
     </div>
   );
 };
