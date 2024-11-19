@@ -2,10 +2,13 @@ import React, { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import { Navigate } from "react-router-dom";
 import "./ProcessDiagram.css";
-import DesignImg from "../assets/design-circle-b.svg";
-import DiscoverImg from "../assets/discover-circle-b.svg";
-import DevelopImg from "../assets/develop-circle-b.svg";
-import DefineImg from "../assets/define-circle-b.svg";
+import DesignImg from "../assets/Design.svg";
+import DotImg from "../assets/Dot.svg";
+import CompanyFooterLogo from "../assets/bottom-logo.svg";
+import PlusImg from "../assets/Plus.svg";
+import DiscoverImg from "../assets/Discover.svg";
+import DevelopImg from "../assets/Develop.svg";
+import DefineImg from "../assets/Define.svg";
 import StackholderImg from "../assets/bottom-stackholder-section.svg";
 import DiscoverBorder from "../assets/discover-border.svg";
 import DefineCard from "../assets/define-border.svg";
@@ -42,7 +45,15 @@ const ProcessDiagram = () => {
 
   return (
     <div className="container product-experience-design">
-      <h1 className="process-dig-title ">Product Experience Design</h1>
+      <div className="process-dig-title-div">
+        <h1 className="process-dig-title ">Product Experience Design</h1>
+        <img
+          src={DotImg}
+          style={{
+            height: "100%",
+          }}
+        />
+      </div>
       <div className="border-div mb-3"></div>
       <div className="row justify-content-between   w-100">
         {/* Stage 1 - Discover */}
@@ -56,9 +67,6 @@ const ProcessDiagram = () => {
               }}
             />
             <div className="stage stage-1   rounded position-relative">
-              {/* <div className="stage-number">1</div> */}
-              {/* <h2 className="stage-title">Discover</h2> */}
-
               <ul className="list-data mt-3">
                 <li>
                   Understanding Business Requirements and Competition Study.
@@ -89,44 +97,12 @@ const ProcessDiagram = () => {
                 src={DiscoverImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-18px",
-                  width: "200px",
+                  marginLeft: "-18.5px",
                   marginTop: "10px",
                 }}
               />
-              {/* <div className="stage-icon">
-              <img src="../assets/circle-image.svg" alt="Discover Icon" />
-            </div> */}
-              {/* <div className="evaluation mt-3">Stakeholder Evaluation</div> */}
             </div>
           </div>
-          {/* <div className="stage stage-1   rounded position-relative">
-            <div className="stage-number">1</div>
-            <h2 className="stage-title">Discover</h2>
-
-            <ul className="list-data mt-3">
-              <li>
-                Understanding Business Requirements and Competition Study.
-              </li>
-              <li>Empathize and synthesize.</li>
-            </ul>
-            <span className="title">Deliverables</span>
-            <div className="deliverables mt-1 red-border">
-              <p>
-                Empathy Mapping, Journey Mapping, Task Flow, Personas,
-                Scenarios, Heuristic Evaluation, Competitor Analysis.
-              </p>
-            </div>
-            <img
-              src={DiscoverImg}
-              alt="discover image"
-              style={{
-                marginLeft: "-22px",
-                width: "100%",
-                marginTop: "20px",
-              }}
-            />
-          </div> */}
         </div>
 
         {/* Stage 2 - Define */}
@@ -140,7 +116,6 @@ const ProcessDiagram = () => {
               }}
             />
             <div className="stage stage-2   rounded position-relative">
-              {/* <h2 className="stage-title">Define</h2> */}
               <ul className="list-data mt-3">
                 <li>Defining the Problem</li>
                 <li>Ideating the solution</li>
@@ -157,17 +132,10 @@ const ProcessDiagram = () => {
                 src={DefineImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-45px",
-                  width: "200px",
+                  marginLeft: "-45.5px",
                   marginTop: "10px",
                 }}
               />
-              {/* <div className="stage-icon">
-              <img src="path/to/define-icon.png" alt="Define Icon" />
-            </div> */}
-              {/* <div className="evaluation mt-3">
-              User & Functionality Validation Stakeholder Evaluation
-            </div> */}
             </div>
           </div>
         </div>
@@ -183,8 +151,6 @@ const ProcessDiagram = () => {
               }}
             />
             <div className="stage stage-3   rounded position-relative">
-              {/* <div className="stage-number">3</div> */}
-              {/* <h2 className="stage-title">Design</h2> */}
               <ul className="list-data mt-3 list-pd">
                 <li>Visualization of the concept</li>
                 <li>Defining the visual language to support Brand identity</li>
@@ -200,17 +166,10 @@ const ProcessDiagram = () => {
                 src={DesignImg}
                 alt="discover image"
                 style={{
-                  marginLeft: "-42px",
-                  width: "200px",
+                  marginLeft: "-43px",
                   marginTop: "10px",
                 }}
               />
-              {/* <div className="stage-icon">
-              <img src="path/to/design-icon.png" alt="Design Icon" />
-            </div> */}
-              {/* <div className="evaluation mt-3">
-              User & Functionality Validation Stakeholder Evaluation
-            </div> */}
             </div>
           </div>
         </div>
@@ -226,8 +185,6 @@ const ProcessDiagram = () => {
               }}
             />
             <div className="stage stage-4   rounded position-relative">
-              {/* <div className="stage-number">4</div>
-            <h2 className="stage-title">Develop</h2> */}
               <ul className="list-data mt-3">
                 <li>
                   Frontend Development to support the defined User Experience.
@@ -249,39 +206,48 @@ const ProcessDiagram = () => {
                 alt="discover image"
                 style={{
                   marginLeft: "-38px",
-                  width: "200px",
                   marginTop: "10px",
                 }}
               />
-
-              {/* <div className="stage-icon">
-              <img src="path/to/develop-icon.png" alt="Develop Icon" />
-            </div> */}
-              {/* <div className="evaluation mt-3">Stakeholder Evaluation</div> */}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Evaluation Links */}
-      {/* <div className="evaluation-links text-center">
-        <div className="evaluation-box">Stakeholder Evaluation</div>
-        <div className="evaluation-box">
-          User & Functionality Validation Stakeholder Evaluation
-        </div>
-        <div className="evaluation-box">
-          User & Functionality Validation Stakeholder Evaluation
-        </div>
-      </div> */}
       <div className="row">
         <img
           src={StackholderImg}
-          alt="discover image"
+          alt="evaluation image"
           style={{
             width: "80%",
             margin: "0px auto 10px auto",
           }}
         />
+      </div>
+      <div className="row">
+        <div className="process-dig-footer mt-5">
+          <div>
+            <img
+              src={PlusImg}
+              style={{
+                height: "100%",
+              }}
+            />
+          </div>
+          <span className="footer-txt">
+            © 2023 Harbinger Group |{" "}
+            <a href="https://www.harbingergroup.com/" target="_blank">
+              www.harbingergroup.com
+              <img
+                src={CompanyFooterLogo}
+                style={{
+                  height: "100%",
+                  marginLeft: "10px",
+                }}
+              />
+            </a>
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -38,6 +38,22 @@
     font-weight: bold;
 }
 
+.process-dig-footer {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.footer-txt a {
+    color: #6D6D6D;
+    text-decoration: none;
+}
+
+.footer-txt {
+    color: #6D6D6D;
+    font-size: 1rem;
+}
+
 .list-data {
     min-height: 130px;
     margin-bottom: 10px;
@@ -49,13 +65,20 @@
     color: #8484A3;
 }
 
+.process-dig-title-div {
+    display: flex;
+    justify-content: space-between;
+}
+
 /* Base container styling */
 .product-experience-design {
-    padding: 40px 10px;
+    padding: 40px 15px;
+    height: 100%;
+    margin-bottom: 60px;
 }
 
 .stage {
-    /* background-color: #f8f9fa; */
+
     border-left: 5px solid;
     position: relative;
     padding: 15px 0px 15px 8px;
@@ -65,17 +88,7 @@
     border: none;
 }
 
-/* .stage-2 {
-    border-color: #f0ad4e;
-}
 
-.stage-3 {
-    border-color: #5bc0de;
-}
-
-.stage-4 {
-    border-color: #5cb85c;
-} */
 
 
 .stage-number {
