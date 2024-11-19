@@ -150,6 +150,7 @@
   border-radius: 14px !important;
   /* Add this line to round the corners */
   overflow: hidden;
+  min-height: 100%;
 }
 
 .template-card .badge.bg-secondary {
