@@ -33,7 +33,6 @@ const DomainLayout = () => {
   const [mockups, setMockups] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const navigate = useNavigate(); // Use useNavigate hook
-  console.log("user===", user);
   const fetchMockups = (userId) => {
     axios
       .get(

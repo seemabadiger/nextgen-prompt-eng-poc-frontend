@@ -7,7 +7,6 @@ const VisualSample = () => {
   return (
     <div className="container-fluid px-0">
       <DomainLayout />
-      Visual Samples
     </div>
   );
 };
