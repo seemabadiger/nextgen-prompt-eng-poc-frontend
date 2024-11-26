@@ -13,10 +13,15 @@ import BeforeAfter from "../pages/BeforeAfter";
 import SearchMockup from "./SearchMockup";
 import VisualSample from "../pages/VisualSample";
 
-const NavbarComponent = ({ setMockups, showModal }) => {
+const NavbarComponent = ({
+  setMockups,
+  showModal,
+  selectedTabValue,
+  selectedTabName,
+}) => {
   const { user, logout } = useContext(AuthContext);
   const [selectedTab, setSelectedTab] = useState("visual-samples");
-  const [key, setKey] = useState("tab1");
+  const [key, setKey] = useState("visualSample");
 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
@@ -25,6 +30,11 @@ const NavbarComponent = ({ setMockups, showModal }) => {
   const handleLogout = async () => {
     await logout();
     <Navigate to="/" />;
+  };
+
+  const handleUploadClick = () => {
+    showModal(!0);
+    selectedTabValue(key);
   };
 
   return (
@@ -75,7 +85,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
         <div style={{ display: "flex", gap: "10px" }}>
           {user?.role?.toLowerCase() === "admin" && (
             <button
-              onClick={() => showModal(!0)}
+              onClick={() => handleUploadClick()}
               style={{
                 ...buttonStyle,
                 background: "transparent",
@@ -163,7 +173,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
               <Nav.Item>
                 <Nav.Link
                   // href="#visual-samples"
-                  eventKey={"tab1"}
+                  eventKey={"visualSample"}
                   style={{
                     ...tabStyle,
                     color: selectedTab === "visual-samples" ? "#000" : "#fff",
@@ -194,7 +204,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
               <Nav.Item>
                 <Nav.Link
                   // href="#case-studies"
-                  eventKey={"tab2"}
+                  eventKey={"caseStudies"}
                   style={{
                     ...tabStyle,
                     color: selectedTab === "case-studies" ? "#000" : "#fff",
@@ -222,7 +232,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
 
               <Nav.Link
                 // href="#process-diagram"
-                eventKey={"tab3"}
+                eventKey={"processDiagram"}
                 style={{
                   ...tabStyle,
                   color: selectedTab === "process-diagram" ? "#000" : "#fff",
@@ -250,7 +260,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
               <Nav.Item>
                 <Nav.Link
                   // href="#before-after"
-                  eventKey={"tab4"}
+                  eventKey={"beforeAfter"}
                   style={{
                     ...tabStyle,
                     color: selectedTab === "before-after" ? "#000" : "#fff",
@@ -278,20 +288,20 @@ const NavbarComponent = ({ setMockups, showModal }) => {
             </Nav>
 
             <Tab.Content>
-              <Tab.Pane eventKey="tab1">
+              <Tab.Pane eventKey="visualSample">
                 <SearchMockup setMockups={setMockups} />
-                <VisualSample />
+                <VisualSample selectedTabName={selectedTabName} />
               </Tab.Pane>
-              <Tab.Pane eventKey="tab2">
+              <Tab.Pane eventKey="caseStudies">
                 <SearchMockup setMockups={setMockups} />
-                <CaseStudies />
+                <CaseStudies selectedTabName={selectedTabName} />
               </Tab.Pane>
-              <Tab.Pane eventKey="tab3">
+              <Tab.Pane eventKey="processDiagram">
                 <ProcessDiagram />
               </Tab.Pane>
-              <Tab.Pane eventKey="tab4">
+              <Tab.Pane eventKey="beforeAfter">
                 <SearchMockup setMockups={setMockups} />
-                <BeforeAfter />
+                <BeforeAfter selectedTabName={selectedTabName} />
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>
@@ -308,22 +318,6 @@ const tabStyle = {
   color: "#000",
   textDecoration: "none",
   cursor: "pointer",
-};
-
-const textBoxParentContainer = {
-  boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-};
-
-const labelStyle = {
-  marginRight: "10px",
-  fontWeight: "bold",
-};
-
-const inputStyle = {
-  border: "none",
-  outline: "none",
-  padding: "5px",
-  flex: 1,
 };
 
 const buttonStyle = {
