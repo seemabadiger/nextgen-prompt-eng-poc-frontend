@@ -1,14 +1,20 @@
 import { CloudUpload, Link, Delete, Save } from "@mui/icons-material";
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Form, Button, Modal, Row, Col } from "react-bootstrap";
 import "./Dashboard.css";
+import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
-  const [selectedPage, setSelectedPage] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
+  const { user } = useContext(AuthContext);
+  const [selectedPage, setSelectedPage] = useState("Process Diagram & Artifacts");
+  const [selectedOption, setSelectedOption] = useState(1);
   const [uploadItems, setUploadItems] = useState({});
   const [isEditable, setIsEditable] = useState({});
   const [currentValue, setCurrentValue] = useState({});
+  const [processes, setProcesses] = useState([]);
+  const [deliverables, setDeliverables] = useState([]);
+  const [filteredDeliverables, setFilteredDeliverables] = useState([]);
 
   // Options and Elements data
   const pages = [
@@ -17,29 +23,128 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
     "Process Diagram & Artifacts",
     "Before After",
   ];
-  const processes = ["Discover", "Define", "Design", "Develop"];
-  const deliverables = [
-    "Empathy Mapping",
-    "Journey Mapping",
-    "Task Flow",
-    "Personas",
-    "Scenarios",
-    "Heuristic Evaluation",
-    "Competitor Analysis",
-  ];
+  
+  // Fetch processes and deliverables data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [processRes, deliverablesRes] = await Promise.all([
+          axios.get("https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/processtypes"),
+          axios.get("https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables"),
+        ]);
 
-  const handleUpload = () => {
-    // Simulate API call
-    console.log("Uploading:", uploadItems);
-    alert("Uploaded successfully!");
+        const processesData = processRes.data; // Array of processes
+        const deliverablesData = deliverablesRes.data; // Array of deliverables
+
+        setProcesses(processesData); // Assuming the API returns an array of strings
+        setDeliverables(deliverablesData); // Assuming the API returns an array of strings
+
+        // Set default process and deliverables
+        if (processesData.length > 0) {
+          const defaultProcessId = processesData[0].id; // First process as default
+          // setSelectedProcessId(defaultProcessId);
+
+          const defaultDeliverables = deliverablesData.filter(
+            (deliverable) => deliverable.processTypeId === defaultProcessId
+          );
+          setFilteredDeliverables(defaultDeliverables);
+          // Initialize current values for the default deliverables
+          const defaultValues = {};
+          defaultDeliverables.forEach((deliverable) => {
+            defaultValues[deliverable.deliverableName] = ""; // Default empty value
+          });
+          setCurrentValue(defaultValues);
+        }
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert("Failed to fetch data. Please try again later.");
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array ensures this runs only once on component mount
+
+  // Filter deliverables based on selected process
+  useEffect(() => {
+    if (selectedOption) {
+      const filtered = (deliverables || []).filter(
+        (deliverable) => deliverable.processTypeId === parseInt(selectedOption)
+      );
+      setFilteredDeliverables(filtered);
+    }
+  }, [selectedOption, deliverables]);
+
+  const uploadProcessDiagram = async (uploadItems, userId, processTypeId) => {
+    try {
+      for (const [deliverable, item] of Object.entries(uploadItems)) {
+        // Prepare FormData for file uploads
+        const formData = new FormData();
+        formData.append("UserId", userId);
+        formData.append("ProcessTypeId", processTypeId);
+
+        if (item.type === "file") {
+          formData.append("DeliverableFile", item.value); // File binary data
+          formData.append("DeliverableLink", item.name); // No link for file upload
+        } else if (item.type === "link") {
+          formData.append("DeliverableFile", ""); // No file for link upload
+          formData.append("DeliverableLink", item.value); // Link value
+        }
+
+        // Find DeliverableId (you might need a mapping from deliverable name to ID)
+        formData.append("DeliverableId", item.deliverableId);
+
+        // Send the request to the API
+        await axios.post(
+          "https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/uploadprocessdiagram",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+
+      
+    } catch (error) {
+      console.error("Error uploading process diagrams:", error);
+      alert("Upload failed. Please try again.");
+      throw error;
+    }
   };
 
-  const handleFileUpload = (key, event) => {
+  const handleUpload = async () => {
+    try {
+      // Replace with the actual user ID and selected process ID
+      const userId = user.id; // Replace with actual UserId
+      const processTypeId = selectedOption; // The selected process ID
+
+      // Call the upload function
+      const updatedDeliverables = await uploadProcessDiagram(uploadItems, userId, processTypeId);
+      // Update the deliverables state with the new data
+      setDeliverables(updatedDeliverables);
+      // Reload the deliverables once all uploads are done
+      const deliverablesRes = await axios.get(
+        "https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables"
+      );
+      const defaultDeliverables = deliverablesRes.data.filter(
+        (deliverable) => deliverable.processTypeId === selectedOption
+      );
+      setFilteredDeliverables(defaultDeliverables);
+      alert("Uploaded successfully!");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("An error occurred during upload.");
+    }
+  };
+
+  const handleFileUpload = (key, id, event) => {
     const file = event.target.files[0]; // Get the uploaded file
     if (file) {
       setUploadItems((prev) => ({
         ...prev,
-        [key]: { type: "file", value: file.name }, // Store only the file name
+        [key]: { type: "file", value: file, name: file.name ,deliverableId: id }, // Store only the file name
       }));
     }
     setIsEditable((prev) => ({ ...prev, [key]: false })); // Disable editing
@@ -50,10 +155,10 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
     setIsEditable((prev) => ({ ...prev, [key]: true })); // Enable editing
   };
 
-  const handleSaveLink = (key) => {
+  const handleSaveLink = (key, id) => {
     setUploadItems((prev) => ({
       ...prev,
-      [key]: { type: "link", value: currentValue[key] },
+      [key]: { type: "link", value: currentValue[key], deliverableId: id },
     }));
     setIsEditable((prev) => ({ ...prev, [key]: false })); // Disable editing
   };
@@ -118,13 +223,13 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
               <div className="d-flex gap-4">
                 {processes.map((process) => (
                   <Form.Check
-                    key={process}
+                    key={process.id}
                     type="radio"
-                    label={process}
+                    label={process.processName}
                     name="processOptions"
-                    value={process}
-                    checked={selectedOption === process}
-                    onChange={() => setSelectedOption(process)}
+                    value={process.id}
+                    checked={selectedOption === process.id}
+                    onChange={() => setSelectedOption(process.id)}
                   />
                 ))}
               </div>
@@ -133,52 +238,51 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
             {/* Section 3: Upload Deliverables */}
             <div className="mt-3">
               <h5 className="modal-title-color my-3">Upload Deliverables</h5>
-              {deliverables.map((deliverable) => (
-                <Row key={deliverable} className="mb-6">
+              {filteredDeliverables.map((deliverable) => (
+                <Row key={deliverable.id} className="mb-6">
                   {/* Deliverable Label */}
                   <div className="d-flex gap-10">
                     <div className="col-md-4 col-sm-8">
                       <Col md={12}>
-                        <strong>{deliverable}</strong>
+                        <strong>{deliverable.deliverableName}</strong>
                       </Col>
 
                       {/* Text Field */}
                       <Col md={12} className="d-flex mt-2">
                         <Form.Control
                           type="text"
-                          value={currentValue[deliverable] || ""}
+                          value={currentValue[deliverable.deliverableName] || ""}
                           placeholder={
-                            uploadItems[deliverable]
-                              ? uploadItems[deliverable].value
+                            uploadItems[deliverable.deliverableName]
+                              ? uploadItems[deliverable.deliverableName].value
                               : "No file or link uploaded"
                           }
-                          disabled={!isEditable[deliverable]} // Disable text field in non-editable mode
+                          disabled={!isEditable[deliverable.deliverableName]} // Disable text field in non-editable mode
                           onChange={(e) =>
                             setCurrentValue((prev) => ({
                               ...prev,
-                              [deliverable]: e.target.value,
+                              [deliverable.deliverableName]: e.target.value,
                             }))
                           }
-                          className={`text-field ${
-                            isEditable[deliverable] ? "" : "deactivated"
-                          }`}
+                          className={`text-field ${isEditable[deliverable.deliverableName] ? "" : "deactivated"
+                            }`}
                         />
 
                         {/* Save Link */}
-                        {isEditable[deliverable] && (
+                        {isEditable[deliverable.deliverableName] && (
                           <div
                             style={{ cursor: "pointer", color: "#28a745" }}
-                            onClick={() => handleSaveLink(deliverable)}
+                            onClick={() => handleSaveLink(deliverable.deliverableName, deliverable.id)}
                           >
                             <Save style={{ fontSize: "1.8rem" }} />
                           </div>
                         )}
 
                         {/* Delete */}
-                        {uploadItems[deliverable] && (
+                        {uploadItems[deliverable.deliverableName] && (
                           <div
                             style={{ cursor: "pointer", color: "#6c63ff" }}
-                            onClick={() => handleDelete(deliverable)}
+                            onClick={() => handleDelete(deliverable.deliverableName)}
                           >
                             <Delete style={{ fontSize: "1.8rem" }} />
                           </div>
@@ -192,12 +296,12 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
                         <div>
                           <Form.Control
                             type="file"
-                            id={`file-upload-${deliverable}`}
+                            id={`file-upload-${deliverable.id}`}
                             style={{ display: "none" }}
-                            onChange={(e) => handleFileUpload(deliverable, e)}
+                            onChange={(e) => handleFileUpload(deliverable.deliverableName, deliverable.id, e)}
                           />
                           <label
-                            htmlFor={`file-upload-${deliverable}`}
+                            htmlFor={`file-upload-${deliverable.id}`}
                             style={{ cursor: "pointer", color: "#6c757d" }}
                           >
                             <CloudUpload
@@ -210,7 +314,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
                         {/* Link Upload */}
                         <div
                           style={{ cursor: "pointer", color: "#6c757d" }}
-                          onClick={() => handleLinkEdit(deliverable)}
+                          onClick={() => handleLinkEdit(deliverable.deliverableName)}
                         >
                           <Link style={{ fontSize: "1.8rem" }} />
                         </div>
