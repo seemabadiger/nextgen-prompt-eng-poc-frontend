@@ -17,6 +17,7 @@ import {
   Dropdown,
   ListGroup,
   Carousel,
+  Spinner,
 } from "react-bootstrap";
 
 const DomainLayout = () => {
@@ -324,6 +325,14 @@ const DomainLayout = () => {
       </div>
       {noMockupsFound ? (
         <p>No mockups found for the entered keyword.</p>
+      ) : !displayedMockups?.length ? (
+        //Added loader using AI
+        <div className="text-center">
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+          <p>Loading...</p>
+        </div>
       ) : (
         <Row className="mt-4">
           {displayedMockups.map((mockup) => (

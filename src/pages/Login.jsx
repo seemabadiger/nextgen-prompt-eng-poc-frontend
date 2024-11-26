@@ -26,8 +26,8 @@ const Login = () => {
             // Replace this with your actual token validation logic
             const isValidToken = true; // Assume the token is valid for demonstration
             if (isValidToken) {
-                setUser({ email: 'user@example.com', role: 'USER' }); // Set user data
-                setIsLoggedIn(true);
+                setUser && setUser({ email: 'user@example.com', role: 'USER' }); // Set user data
+                setIsLoggedIn && setIsLoggedIn(true);
             }
         }
     }, [cookies, setUser, setIsLoggedIn]);
