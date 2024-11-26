@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import { Navigate } from "react-router-dom";
 import "./ProcessDiagram.css";
@@ -14,26 +14,79 @@ import DiscoverBorder from "../assets/discover-border.svg";
 import DefineCard from "../assets/define-border.svg";
 import DesignCard from "../assets/design-border.svg";
 import DevelopCard from "../assets/develop-border.svg";
+import axios from "axios";
 
 const ProcessDiagram = () => {
-  const deliverables = [
-    {
-      label: "Empathy Mapping",
-      link: "https://example.com/empathy-mapping",
-      file: "https://example.com/file1.pdf",
-    },
-    {
-      label: "Journey Mapping",
-      link: "https://example.com/journey-mapping",
-      file: "",
-    },
-    {
-      label: "Task Flow",
-      link: "",
-      file: "https://example.com/file2.pdf",
-    },
-    // Add more items as needed
-  ];
+
+  const [diagrams, setDiagrams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [deliverables1, setDeliverables1] = useState([]);
+  const [deliverables2, setDeliverables2] = useState([]);
+  const [deliverables3, setDeliverables3] = useState([]);
+  const [deliverables4, setDeliverables4] = useState([]);
+
+  useEffect(() => {
+    const fetchDeliverablesAndDiagrams = async () => {
+      try {
+        const deliverables = await axios.get(
+          "https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables"
+        );
+
+        const response = await axios.get(
+          "https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/getprocessdiagrams"
+        );
+        setDiagrams(response.data);
+
+
+        const deliverablesData = deliverables.data; // Array of deliverables
+        const diagramsData = response.data
+
+        setDeliverables1(convertDeliverables(response.data, deliverablesData, 1) || []);
+        setDeliverables2(convertDeliverables(response.data, deliverablesData, 2) || []);
+        setDeliverables3(convertDeliverables(response.data, deliverablesData, 3) || []);
+        setDeliverables4(convertDeliverables(response.data, deliverablesData, 4) || []);
+
+        setDiagrams(diagramsData);
+      } catch (error) {
+        console.error("Error fetching diagrams:", error);
+        alert("Failed to fetch process diagrams. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDeliverablesAndDiagrams();
+  }, []);
+
+  const convertDeliverables = (processData, processTypeData, processId) => {
+    // Find the process matching the given processId
+    const process = processData.find((item) => item.processId === processId);
+
+    // Get the deliverables for the specific process
+    const processDeliverables = process?.deliverables || [];
+
+    // Filter deliverables from the second input that match the same processId
+    const processTypeDeliverables = processTypeData.filter(
+      (item) => item.processTypeId === processId
+    );
+
+    // Map the deliverables to the desired format
+    const result = processTypeDeliverables.map((typeDeliverable) => {
+      // Find the corresponding deliverable in the first input
+      const match = processDeliverables.find(
+        (deliverable) =>
+          deliverable.deliverableName === typeDeliverable.deliverableName
+      );
+
+      return {
+        label: typeDeliverable.deliverableName,
+        link: match?.deliverableLink || "",
+        file: match?.deliverableFilePath || "",
+      };
+    });
+
+    return result;
+  };
 
   const handleClick = (link, file) => {
     if (link) {
@@ -43,6 +96,24 @@ const ProcessDiagram = () => {
     }
   };
 
+  const returnDeliverables = (deliverables) => {
+    return deliverables.map((item, index) => (
+      <span key={index}>
+        <a
+          href="#"
+          className="link-text"
+          onClick={(e) => {
+            e.preventDefault();
+            if(item.link || item.file) {
+              handleClick(item.link, item.file);
+            }
+          }}
+        >
+          {index + 1 !== deliverables.length ? `${item.label}, ` : item.label}
+        </a>
+      </span>
+    ))
+  }
   return (
     <div className="container product-experience-design">
       <div className="process-dig-title-div">
@@ -76,21 +147,7 @@ const ProcessDiagram = () => {
               <span className="title">Deliverables</span>
               <div className="deliverables mt-1 red-border">
                 <p>
-                  {deliverables.map((item, index) => (
-                    <span key={index}>
-                      <a
-                        href="#"
-                        className="link-text"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleClick(item.link, item.file);
-                        }}
-                      >
-                        {item.label}
-                      </a>
-                      {index < deliverables.length - 1 && ", "}{" "}
-                    </span>
-                  ))}
+                  {returnDeliverables(deliverables1)}
                 </p>
               </div>
               <img
@@ -124,8 +181,7 @@ const ProcessDiagram = () => {
               <span className="title">Deliverables</span>
               <div className="deliverables mt-1 pink-border">
                 <p>
-                  Information Architecture, Low-hi fidelity Wireframes,
-                  Prototype, Research Report.
+                  {returnDeliverables(deliverables2)}
                 </p>
               </div>
               <img
@@ -158,8 +214,7 @@ const ProcessDiagram = () => {
               <span className="title">Deliverables</span>
               <div className="deliverables mt-1 blue-border">
                 <p>
-                  Branding Style Guide, Visual Design, Design System, Clickable
-                  Prototype.
+                  {returnDeliverables(deliverables3)}
                 </p>
               </div>
               <img
@@ -196,8 +251,7 @@ const ProcessDiagram = () => {
               <span className="title">Deliverables</span>
               <div className="deliverables mt-1 green-border">
                 <p>
-                  HTML-CSS Markups, Atomic Design, Accessibility Compliance,
-                  React/Angular based components.
+                  {returnDeliverables(deliverables4)}
                 </p>
               </div>
 
