@@ -28,6 +28,7 @@ const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
   const [show, setShow] = useState(false);
   const [selectedTab, setSelectedTab] = useState("visualSample");
+  const [tabName, setTabName] = useState("Visual Samples");
   const [mockups, setMockups] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const [updateModalShow, setUpdateModalShow] = useState(false);
@@ -57,6 +58,12 @@ const DashboardLayout = () => {
       fetchFavorites();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (selectedTab) {
+      handleTab(selectedTab);
+    }
+  }, [selectedTab]);
 
   // Sort mockups based on selected option
   useEffect(() => {
@@ -101,7 +108,9 @@ const DashboardLayout = () => {
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
-  const handleTabSelection = (val) => setSelectedTab(val);
+  const handleTabSelection = (val) => {
+    setSelectedTab(val);
+  };
 
   const handleUpload = (newMockups) => {
     setMockups((prev) => [...prev, ...newMockups]);
@@ -348,6 +357,15 @@ const DashboardLayout = () => {
       );
     }
   };
+  const handleTab = (val) => {
+    if (val === "visualSample") {
+      return "Visual Samples";
+    } else if (val === "caseStudies") {
+      return "Case Studies";
+    } else if (val === "beforeAfter") {
+      return "Before After";
+    }
+  };
 
   return (
     <div>
@@ -355,6 +373,7 @@ const DashboardLayout = () => {
         setMockups={setMockups}
         showModal={handleShow}
         selectedTabValue={handleTabSelection}
+        selectedTabName={tabName}
       />
       {renderUpload()}
       {/* <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}

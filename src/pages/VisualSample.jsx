@@ -3,10 +3,10 @@ import { AuthContext } from "../Context/AuthContext";
 import { Navigate } from "react-router-dom";
 import DomainLayout from "../Components/DomainLayout";
 
-const VisualSample = () => {
+const VisualSample = (props) => {
   return (
     <div className="container-fluid px-0">
-      <DomainLayout />
+      <DomainLayout tabName={props?.selectedTabName} />
     </div>
   );
 };

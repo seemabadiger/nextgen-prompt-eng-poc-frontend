@@ -13,7 +13,12 @@ import BeforeAfter from "../pages/BeforeAfter";
 import SearchMockup from "./SearchMockup";
 import VisualSample from "../pages/VisualSample";
 
-const NavbarComponent = ({ setMockups, showModal, selectedTabValue }) => {
+const NavbarComponent = ({
+  setMockups,
+  showModal,
+  selectedTabValue,
+  selectedTabName,
+}) => {
   const { user, logout } = useContext(AuthContext);
   const [selectedTab, setSelectedTab] = useState("visual-samples");
   const [key, setKey] = useState("visualSample");
@@ -285,18 +290,18 @@ const NavbarComponent = ({ setMockups, showModal, selectedTabValue }) => {
             <Tab.Content>
               <Tab.Pane eventKey="visualSample">
                 <SearchMockup setMockups={setMockups} />
-                <VisualSample />
+                <VisualSample selectedTabName={selectedTabName} />
               </Tab.Pane>
               <Tab.Pane eventKey="caseStudies">
                 <SearchMockup setMockups={setMockups} />
-                <CaseStudies />
+                <CaseStudies selectedTabName={selectedTabName} />
               </Tab.Pane>
               <Tab.Pane eventKey="processDiagram">
                 <ProcessDiagram />
               </Tab.Pane>
               <Tab.Pane eventKey="beforeAfter">
                 <SearchMockup setMockups={setMockups} />
-                <BeforeAfter />
+                <BeforeAfter selectedTabName={selectedTabName} />
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>

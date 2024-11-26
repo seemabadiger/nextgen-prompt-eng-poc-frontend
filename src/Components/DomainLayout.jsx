@@ -20,7 +20,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 
-const DomainLayout = () => {
+const DomainLayout = (props) => {
   const { user } = useContext(AuthContext);
   const [selectedMockups, setSelectedMockups] = useState([]);
   const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState(
@@ -49,6 +49,7 @@ const DomainLayout = () => {
           tags: mockup.tags.map((tag) => tag.name),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType,
         }));
         setMockups(fetchedMockups);
         setNoMockupsFound(fetchedMockups.length === 0);
@@ -147,6 +148,7 @@ const DomainLayout = () => {
           tags: mockup.tags.map((tag) => tag.name),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType,
         }));
         setMockups(filteredMockups);
         setNoMockupsFound(filteredMockups.length === 0);
@@ -214,6 +216,7 @@ const DomainLayout = () => {
           tags: mockup.tags.map((tag) => tag.name),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType,
         }));
         setMockups(sortedMockups);
         setNoMockupsFound(sortedMockups.length === 0);
@@ -254,6 +257,61 @@ const DomainLayout = () => {
       }
     });
     setSelectedMockupsForDownload(selected);
+  };
+
+  const handleMockupData = () => {
+    const selectedMockups = displayedMockups?.filter(
+      (res) => res?.mockupType?.name === props.tabName
+    );
+    return (selectedMockups || []).map((mockup) => (
+      <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
+        <Card className="template-card" onClick={() => handleCardClick(mockup)}>
+          <div className="checkbox-container d-flex align-items-center">
+            {user?.role === "User" && (
+              <FavoriteIcon
+                className="me-2"
+                style={{
+                  cursor: "pointer",
+                  color: favorites.includes(mockup.id) ? "red" : "grey",
+                  fontSize: "1.25rem", // Adjust this value to match the checkbox size
+                }}
+                onClick={(e) => handleFavorite(e, mockup.id)}
+              />
+            )}
+            <Form.Check
+              type="checkbox"
+              checked={selectedMockups.includes(mockup.id)}
+              onChange={(e) => handleCheckboxChange(e, mockup.id)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          <Carousel interval={null} onClick={handleCarouselClick}>
+            {mockup.images.map((image, index) => (
+              <Carousel.Item key={index}>
+                <img
+                  className="d-block w-100 cardImg"
+                  src={image}
+                  alt={`Slide ${index}`}
+                />
+              </Carousel.Item>
+            ))}
+          </Carousel>
+          <Card.Body>
+            <Card.Title>
+              {mockup.domainname}| {mockup.subdomainname}
+            </Card.Title>
+            <Card.Text>{mockup.title}</Card.Text>
+            <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
+              {mockup.tags.map((tag) => (
+                <ListGroup.Item key={tag} className="border-0 p-0 me-2">
+                  <Badge bg="secondary">{tag}</Badge>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Card.Body>
+        </Card>
+      </Col>
+    ));
   };
 
   return (
@@ -334,60 +392,7 @@ const DomainLayout = () => {
           <p>Loading...</p>
         </div>
       ) : (
-        <Row className="mt-4">
-          {displayedMockups.map((mockup) => (
-            <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
-              <Card
-                className="template-card"
-                onClick={() => handleCardClick(mockup)}
-              >
-                <div className="checkbox-container d-flex align-items-center">
-                  {user?.role === "User" && (
-                    <FavoriteIcon
-                      className="me-2"
-                      style={{
-                        cursor: "pointer",
-                        color: favorites.includes(mockup.id) ? "red" : "grey",
-                        fontSize: "1.25rem", // Adjust this value to match the checkbox size
-                      }}
-                      onClick={(e) => handleFavorite(e, mockup.id)}
-                    />
-                  )}
-                  <Form.Check
-                    type="checkbox"
-                    checked={selectedMockups.includes(mockup.id)}
-                    onChange={(e) => handleCheckboxChange(e, mockup.id)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-                <Carousel interval={null} onClick={handleCarouselClick}>
-                  {mockup.images.map((image, index) => (
-                    <Carousel.Item key={index}>
-                      <img
-                        className="d-block w-100 cardImg"
-                        src={image}
-                        alt={`Slide ${index}`}
-                      />
-                    </Carousel.Item>
-                  ))}
-                </Carousel>
-                <Card.Body>
-                  <Card.Title>
-                    {mockup.domainname}| {mockup.subdomainname}
-                  </Card.Title>
-                  <Card.Text>{mockup.title}</Card.Text>
-                  <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
-                    {mockup.tags.map((tag) => (
-                      <ListGroup.Item key={tag} className="border-0 p-0 me-2">
-                        <Badge bg="secondary">{tag}</Badge>
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        <Row className="mt-4">{handleMockupData()}</Row>
       )}
     </Container>
   );
