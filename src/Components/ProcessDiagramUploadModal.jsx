@@ -85,7 +85,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
 
         if (item.type === "file") {
           formData.append("DeliverableFile", item.value); // File binary data
-          formData.append("DeliverableLink", item.name); // No link for file upload
+          formData.append("DeliverableLink", ""); // No link for file upload
         } else if (item.type === "link") {
           formData.append("DeliverableFile", ""); // No file for link upload
           formData.append("DeliverableLink", item.value); // Link value
@@ -144,7 +144,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
     if (file) {
       setUploadItems((prev) => ({
         ...prev,
-        [key]: { type: "file", value: file, name: file.name ,deliverableId: id }, // Store only the file name
+        [key]: { type: "file", value: file, deliverableId: id }, // Store only the file name
       }));
     }
     setIsEditable((prev) => ({ ...prev, [key]: false })); // Disable editing
