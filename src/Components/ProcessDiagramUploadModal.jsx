@@ -14,6 +14,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
   const [currentValue, setCurrentValue] = useState({});
   const [processes, setProcesses] = useState([]);
   const [deliverables, setDeliverables] = useState([]);
+  const [diagrams, setDiagrams] = useState([]);
   const [filteredDeliverables, setFilteredDeliverables] = useState([]);
 
   // Options and Elements data
@@ -69,6 +70,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
               ""; // Default empty if none
           });
           setCurrentValue(defaultValues);
+          setDiagrams(diagramsData);
         }
 
       } catch (error) {
@@ -87,6 +89,22 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
         (deliverable) => deliverable.processTypeId === parseInt(selectedOption)
       );
       setFilteredDeliverables(filtered);
+      const defaultValues = {};
+      filtered.forEach((deliverable) => {
+        // Find corresponding deliverable in process diagrams
+        const diagram = diagrams.find(
+          (diagram) => diagram.processId === selectedOption
+        );
+        const linkedDeliverable = diagram?.deliverables.find(
+          (d) => d.deliverableId === deliverable.id
+        );
+
+        // Map link or file to the deliverable
+        defaultValues[deliverable.deliverableName] = linkedDeliverable?.deliverableLink ||
+          linkedDeliverable?.deliverableFileName ||
+          ""; // Default empty if none
+      });
+      setCurrentValue(defaultValues);
     }
   }, [selectedOption, deliverables]);
 
@@ -105,7 +123,6 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
           formData.append("DeliverableFile", ""); // No file for link upload
           formData.append("DeliverableLink", item.value); // Link value
         }
-
         // Find DeliverableId (you might need a mapping from deliverable name to ID)
         formData.append("DeliverableId", item.deliverableId);
 
@@ -120,8 +137,6 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
           }
         );
       }
-
-
     } catch (error) {
       console.error("Error uploading process diagrams:", error);
       alert("Upload failed. Please try again.");
@@ -139,6 +154,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
       const updatedDeliverables = await uploadProcessDiagram(uploadItems, userId, processTypeId);
       // Update the deliverables state with the new data
       setDeliverables(updatedDeliverables);
+      alert("Uploaded successfully!");
       // Reload the deliverables once all uploads are done
       const deliverablesRes = await axios.get(
         "https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables"
@@ -146,8 +162,9 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
       const defaultDeliverables = deliverablesRes.data.filter(
         (deliverable) => deliverable.processTypeId === selectedOption
       );
+      setDeliverables(deliverablesRes.data)
       setFilteredDeliverables(defaultDeliverables);
-      alert("Uploaded successfully!");
+      setSelectedOption(selectedOption)
     } catch (error) {
       console.error("Upload failed:", error);
       alert("An error occurred during upload.");

@@ -332,13 +332,13 @@ const DashboardLayout = () => {
         />
       );
     } else if (selectedTab === "processDiagram") {
-      // return (
-      //   <ProcessUploadModal
-      //     show={show}
-      //     handleClose={handleClose}
-      //     handleUpload={handleUpload}
-      //   />
-      // );
+      return (
+        <ProcessUploadModal
+          show={show}
+          handleClose={handleClose}
+          handleUpload={handleUpload}
+        />
+      );
     } else if (selectedTab === "beforeAfter") {
       return (
         <BeforeAfterUpload
