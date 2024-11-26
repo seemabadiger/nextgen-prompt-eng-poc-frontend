@@ -23,18 +23,20 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
     "Process Diagram & Artifacts",
     "Before After",
   ];
-  
+
   // Fetch processes and deliverables data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [processRes, deliverablesRes] = await Promise.all([
+        const [processRes, deliverablesRes, diagramsRes] = await Promise.all([
           axios.get("https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/processtypes"),
           axios.get("https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables"),
+          axios.get("https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/getprocessdiagrams")
         ]);
 
         const processesData = processRes.data; // Array of processes
         const deliverablesData = deliverablesRes.data; // Array of deliverables
+        const diagramsData = diagramsRes.data;
 
         setProcesses(processesData); // Assuming the API returns an array of strings
         setDeliverables(deliverablesData); // Assuming the API returns an array of strings
@@ -47,11 +49,24 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
           const defaultDeliverables = deliverablesData.filter(
             (deliverable) => deliverable.processTypeId === defaultProcessId
           );
+
           setFilteredDeliverables(defaultDeliverables);
-          // Initialize current values for the default deliverables
+
+
           const defaultValues = {};
           defaultDeliverables.forEach((deliverable) => {
-            defaultValues[deliverable.deliverableName] = ""; // Default empty value
+            // Find corresponding deliverable in process diagrams
+            const diagram = diagramsData.find(
+              (diagram) => diagram.processId === defaultProcessId
+            );
+            const linkedDeliverable = diagram?.deliverables.find(
+              (d) => d.deliverableId === deliverable.id
+            );
+
+            // Map link or file to the deliverable
+            defaultValues[deliverable.deliverableName] = linkedDeliverable?.deliverableLink ||
+              linkedDeliverable?.deliverableFileName ||
+              ""; // Default empty if none
           });
           setCurrentValue(defaultValues);
         }
@@ -106,7 +121,7 @@ const ProcessUploadModal = ({ show, handleClose, onUpload }) => {
         );
       }
 
-      
+
     } catch (error) {
       console.error("Error uploading process diagrams:", error);
       alert("Upload failed. Please try again.");
