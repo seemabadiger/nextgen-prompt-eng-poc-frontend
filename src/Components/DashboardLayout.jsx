@@ -1,28 +1,48 @@
-import { useState, useEffect, useContext } from 'react';
-import { Container, Navbar, Nav, Form, Button, Row, Col, Card, Badge, DropdownButton, Dropdown, Modal, ListGroup, Carousel } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
-import axios from 'axios';
-import './Dashboard.css';
-import UploadMockupModal from './UploadMockupModal';
-import NavbarComponent from './Navbar';
-import { AuthContext } from '../Context/AuthContext';
+import { useState, useEffect, useContext } from "react";
+import {
+  Container,
+  Navbar,
+  Nav,
+  Form,
+  Button,
+  Row,
+  Col,
+  Card,
+  Badge,
+  DropdownButton,
+  Dropdown,
+  Modal,
+  ListGroup,
+  Carousel,
+} from "react-bootstrap";
+import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
+import axios from "axios";
+import "./Dashboard.css";
+import UploadMockupModal from "./UploadMockupModal";
+import NavbarComponent from "./Navbar";
+import { AuthContext } from "../Context/AuthContext";
+import ProcessUploadModal from "./ProcessDiagramUploadModal";
+import BeforeAfterUpload from "./BeforeAfterUpload";
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
   const [show, setShow] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("visualSample");
   const [mockups, setMockups] = useState([]);
-  const [sortOption, setSortOption] = useState('');
+  const [sortOption, setSortOption] = useState("");
   const [updateModalShow, setUpdateModalShow] = useState(false);
   const [selectedMockup, setSelectedMockup] = useState(null);
   const [updateForm, setUpdateForm] = useState({
-    Name: '',
+    Name: "",
     Tags: [],
-    Domainname: '',
-    Subdomainname: '',
-    Image: ''
+    Domainname: "",
+    Subdomainname: "",
+    Image: "",
   });
   const [selectedMockups, setSelectedMockups] = useState([]);
-  const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState([]);
+  const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState(
+    []
+  );
   // const [activeButton, setActiveButton] = useState('');
   const navigate = useNavigate(); // Use useNavigate hook
   const [favorites, setFavorites] = useState([]);
@@ -46,28 +66,31 @@ const DashboardLayout = () => {
   }, [sortOption]);
 
   const fetchMockups = (userId) => {
-    axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`)
-      .then(response => {
-        const fetchedMockups = response.data.map(mockup => ({
+    axios
+      .get(
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`
+      )
+      .then((response) => {
+        const fetchedMockups = response.data.map((mockup) => ({
           id: mockup.id,
           title: mockup.projectTitle,
           description: mockup.projectDescription,
-          images: mockup.mockups.map(m => m.filePath),
-          tags: mockup.tags.map(tag => tag.name),
+          images: mockup.mockups.map((m) => m.filePath),
+          tags: mockup.tags.map((tag) => tag.name),
           domainname: mockup.domain.name,
-          subdomainname: mockup.subdomain.name
+          subdomainname: mockup.subdomain.name,
         }));
         setMockups(fetchedMockups);
         setNoMockupsFound(fetchedMockups.length === 0);
       })
-      .catch(error => {
-        console.error('Error fetching mockups:', error);
+      .catch((error) => {
+        console.error("Error fetching mockups:", error);
       });
   };
 
   const sortMockups = (sort) => {
     let sortedMockups = [...mockups];
-    if (sort === 'Alphabetically') {
+    if (sort === "Alphabetically") {
       sortedMockups.sort((a, b) => a.title.localeCompare(b.title));
     } else {
       // Assuming there's a date field for sorting by date
@@ -78,9 +101,10 @@ const DashboardLayout = () => {
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
+  const handleTabSelection = (val) => setSelectedTab(val);
 
   const handleUpload = (newMockups) => {
-    setMockups(prev => [...prev, ...newMockups]);
+    setMockups((prev) => [...prev, ...newMockups]);
   };
 
   // const handleSortSelect = (sort) => {
@@ -242,11 +266,15 @@ const DashboardLayout = () => {
 
     setIsLoadingFavorites(true);
     try {
-      const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
-      const favoriteIds = response.data.map(favorite => favorite.mockupGroupId);
+      const response = await axios.get(
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`
+      );
+      const favoriteIds = response.data.map(
+        (favorite) => favorite.mockupGroupId
+      );
       setFavorites(favoriteIds);
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      console.error("Error fetching favorites:", error);
     } finally {
       setIsLoadingFavorites(false);
     }
@@ -277,10 +305,59 @@ const DashboardLayout = () => {
   //   }
   // };
 
+  const renderUpload = () => {
+    if (selectedTab === "visualSample") {
+      return (
+        <UploadMockupModal
+          show={show}
+          handleClose={handleClose}
+          handleUpload={handleUpload}
+        />
+      );
+    } else if (selectedTab === "caseStudies") {
+      return (
+        <UploadMockupModal
+          show={show}
+          handleClose={handleClose}
+          handleUpload={handleUpload}
+        />
+      );
+    } else if (selectedTab === "processDiagram") {
+      // return (
+      //   <ProcessUploadModal
+      //     show={show}
+      //     handleClose={handleClose}
+      //     handleUpload={handleUpload}
+      //   />
+      // );
+    } else if (selectedTab === "beforeAfter") {
+      return (
+        <BeforeAfterUpload
+          show={show}
+          handleClose={handleClose}
+          handleUpload={handleUpload}
+        />
+      );
+    } else {
+      return (
+        <UploadMockupModal
+          show={show}
+          handleClose={handleClose}
+          handleUpload={handleUpload}
+        />
+      );
+    }
+  };
+
   return (
     <div>
-      <NavbarComponent setMockups={setMockups} showModal={handleShow} />
-      <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} />
+      <NavbarComponent
+        setMockups={setMockups}
+        showModal={handleShow}
+        selectedTabValue={handleTabSelection}
+      />
+      {renderUpload()}
+      {/* <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}
       {/* <ProcessUploadModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}
     </div>
   );

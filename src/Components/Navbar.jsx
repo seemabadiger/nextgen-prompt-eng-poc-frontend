@@ -13,7 +13,7 @@ import BeforeAfter from "../pages/BeforeAfter";
 import SearchMockup from "./SearchMockup";
 import VisualSample from "../pages/VisualSample";
 
-const NavbarComponent = ({ setMockups, showModal }) => {
+const NavbarComponent = ({ setMockups, showModal, selectedTabValue }) => {
   const { user, logout } = useContext(AuthContext);
   const [selectedTab, setSelectedTab] = useState("visual-samples");
   const [key, setKey] = useState("visualSample");
@@ -25,6 +25,11 @@ const NavbarComponent = ({ setMockups, showModal }) => {
   const handleLogout = async () => {
     await logout();
     <Navigate to="/" />;
+  };
+
+  const handleUploadClick = () => {
+    showModal(!0);
+    selectedTabValue(key);
   };
 
   return (
@@ -75,7 +80,7 @@ const NavbarComponent = ({ setMockups, showModal }) => {
         <div style={{ display: "flex", gap: "10px" }}>
           {user?.role?.toLowerCase() === "admin" && (
             <button
-              onClick={() => showModal(!0)}
+              onClick={() => handleUploadClick()}
               style={{
                 ...buttonStyle,
                 background: "transparent",
