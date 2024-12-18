@@ -23,6 +23,7 @@ import NavbarComponent from "./Navbar";
 import { AuthContext } from "../Context/AuthContext";
 import ProcessUploadModal from "./ProcessDiagramUploadModal";
 import BeforeAfterUpload from "./BeforeAfterUpload";
+import CaseStudyUpload from "./CaseStudyUpload";
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
@@ -325,7 +326,7 @@ const DashboardLayout = () => {
       );
     } else if (selectedTab === "caseStudies") {
       return (
-        <UploadMockupModal
+        <CaseStudyUpload
           show={show}
           handleClose={handleClose}
           handleUpload={handleUpload}

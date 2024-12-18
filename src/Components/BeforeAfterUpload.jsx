@@ -1,247 +1,414 @@
-import { CloudUpload, Link, Delete, Save } from "@mui/icons-material";
-import React, { useState } from "react";
-import { Form, Button, Modal, Row, Col } from "react-bootstrap";
-import "./Dashboard.css";
+import { useState, useEffect, useRef,useContext } from 'react';
+import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
+import axios from 'axios';
+import CloudUpload from "../assets/cloud-upload.svg";
+import TimesIcon from '@mui/icons-material/Close'
+import Editor from './Editor';
+import { AuthContext } from '../Context/AuthContext';
 
 const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
-  const [selectedPage, setSelectedPage] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
-  const [uploadItems, setUploadItems] = useState({});
-  const [isEditable, setIsEditable] = useState({});
-  const [currentValue, setCurrentValue] = useState({});
+  const { user } = useContext(AuthContext);
+  const [mockups, setMockups] = useState([]);
+  const [fields, setFields] = useState({
+    mockuptype: '',
+    title: '',
+    domain: '',
+    subdomain: '',
+    description: '',
+    tags: [],
+  });
+  const editorRef = useRef(null);
+  const tagOptions = ['Mobile', 'Web', 'Desktop', 'Tablet'];
 
-  // Options and Elements data
-  const pages = [
-    "Visual Samples",
-    "Case Studies",
-    "Process Diagram & Artifacts",
-    "Before After",
-  ];
-  const processes = ["Discover", "Define", "Design", "Develop"];
-  const deliverables = [
-    "Empathy Mapping",
-    "Journey Mapping",
-    "Task Flow",
-    "Personas",
-    "Scenarios",
-    "Heuristic Evaluation",
-    "Competitor Analysis",
-  ];
-
-  const handleUpload = () => {
-    // Simulate API call
-    console.log("Uploading:", uploadItems);
-    alert("Uploaded successfully!");
+  const handleFileChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    const newMockups = newFiles.map((file) => ({
+      file,
+      title: '',
+      domain: '',
+      subdomain: '',
+      tags: [], // Initialize as an empty array
+    }));
+    setMockups(newFiles);
   };
 
-  const handleFileUpload = (key, event) => {
-    const file = event.target.files[0]; // Get the uploaded file
-    if (file) {
-      setUploadItems((prev) => ({
-        ...prev,
-        [key]: { type: "file", value: file.name }, // Store only the file name
+  const handleInputChange = (index, e) => {
+    const { name, value } = e.target;
+    setMockups((prevMockups) =>
+      prevMockups.map((mockup, i) =>
+        i === index ? { ...mockup, [name]: value } : mockup
+      )
+    );
+  };
+
+  const handleTagChange = (index, tag) => {
+    setFields((prevState) => ({
+      ...prevState,
+      tags: prevState.tags.includes(tag)
+        ? prevState.tags.filter((t) => t !== tag)
+        : [...prevState.tags, tag],
+    }));
+  };
+
+  const handleRemoveFile = (index) => {
+    setMockups((prevMockups) => prevMockups.filter((_, i) => i !== index));
+  };
+
+  const handleChange = (e) => {
+    if (e.target) {
+      setFields((prevState) => ({
+        ...prevState,
+        [e.target.name]: e.target.value,
+      }));
+    } else {
+      setFields((prevState) => ({
+        ...prevState,
+        description: editorRef.current.root.innerHTML,
       }));
     }
-    setIsEditable((prev) => ({ ...prev, [key]: false })); // Disable editing
-    setCurrentValue((prev) => ({ ...prev, [key]: file.name })); // Set file name
   };
 
-  const handleLinkEdit = (key) => {
-    setIsEditable((prev) => ({ ...prev, [key]: true })); // Enable editing
+  const handleUpload = async () => {
+    if (mockups.length === 0) {
+      alert('Please add at least one file.');
+      return;
+    }
+
+    try {
+      const uploadPromises = mockups.map((mockup) => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            resolve({
+              ...mockup,
+              image: e.target.result,
+              fileName: mockup.file.name,
+            });
+          };
+          reader.readAsDataURL(mockup.file);
+        });
+      });
+
+      const newMockups = await Promise.all(uploadPromises);
+      const formData = new FormData();
+      mockups.forEach((mockup, index) => {
+        formData.append('MockupFiles', mockup.file);
+      });
+      formData.append('MockupType', fields.mockuptype);
+      formData.append('ProjectTitle', fields.title);
+      formData.append('DomainName', fields.domain);
+      formData.append('SubdomainName', fields.subdomain);
+      formData.append('ImageGroupId', '');
+      formData.append('ProjectDescription', fields.description);
+      fields.tags.forEach((tag) => {
+        formData.append('Tags', tag);
+      });
+
+      await axios.post(
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/uploadbeforeafter?userId=${user.id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      alert('Files uploaded successfully.');
+      onUpload(newMockups);
+      handleClose();
+      setMockups([]);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('An error occurred while uploading the files.');
+    }
   };
 
-  const handleSaveLink = (key) => {
-    setUploadItems((prev) => ({
-      ...prev,
-      [key]: { type: "link", value: currentValue[key] },
+  const handleTagRemove = (index) => {
+    setFields((prevState) => ({
+      ...prevState,
+      tags: prevState.tags.filter((t, i) => i !== index),
     }));
-    setIsEditable((prev) => ({ ...prev, [key]: false })); // Disable editing
   };
 
-  const handleDelete = (key) => {
-    setUploadItems((prev) => {
-      const newItems = { ...prev };
-      delete newItems[key];
-      return newItems;
-    });
-    setCurrentValue((prev) => {
-      const newValues = { ...prev };
-      delete newValues[key];
-      return newValues;
-    });
-    setIsEditable((prev) => {
-      const newEditable = { ...prev };
-      delete newEditable[key];
-      return newEditable;
-    });
+  const handleTagInputKeyDown = (e) => {
+    if (e.key === 'Enter' && e.target.value.trim() !== '') {
+      const newTag = e.target.value.trim();
+      setFields((prevState) => ({
+        ...prevState,
+        tags: [...prevState.tags, newTag],
+      }));
+      e.target.value = '';
+    }
   };
+
+  useEffect(() => {
+    if (show) {
+      setFields({
+        mockuptype: '',
+        title: '',
+        domain: '',
+        subdomain: '',
+        description: '',
+        tags: [],
+      });
+      setMockups([]);
+    }
+  }, [show]);
 
   return (
-    <>
-      {/* Main Modal for Upload Form */}
-      <Modal
-        show={show}
-        onHide={handleClose}
-        size="lg"
-        className="process-dig-upload-modal"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Upload</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            {/* Section 1: Page Selection */}
-            <Form.Group>
-              <Form.Label>
-                <h5 className="modal-title-color">Select Section</h5>
-              </Form.Label>
-              <div className="d-flex gap-4">
-                {pages.map((page) => (
-                  <Form.Check
-                    key={page}
-                    type="radio"
-                    label={page}
-                    name="pageOptions"
-                    value={page}
-                    checked={selectedPage === page}
-                    onChange={() => setSelectedPage(page)}
-                  />
-                ))}
+    <Modal show={show} onHide={handleClose} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Add New Mock-up</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+      <Form.Group className="mb-4">
+          <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>
+            SELECT SECTION
+          </Form.Label>
+          <div className="d-flex gap-4">
+            <Form.Check
+              type="radio"
+              id="visual-samples"
+              label="Visual Samples"
+              name="mockuptype"
+              value="Visual Samples"
+              checked={fields.mockuptype === 'Visual Samples'}
+              onChange={handleChange}
+              className="me-3"
+            />
+            <Form.Check
+              type="radio"
+              id="case-studies"
+              label="Case Studies"
+              name="mockuptype"
+              value="Case Studies"
+              checked={fields.mockuptype === 'Case Studies'}
+              onChange={handleChange}
+              className="me-3"
+            />
+            <Form.Check
+              type="radio"
+              id="process-diagram"
+              label="Process Diagram & Artifacts"
+              name="mockuptype"
+              value="Process Diagram & Artifacts"
+              checked={fields.mockuptype === 'Process Diagram & Artifacts'}
+              onChange={handleChange}
+              className="me-3"
+            />
+            <Form.Check
+              type="radio"
+              id="before-after"
+              label="Before After"
+              name="mockuptype"
+              value="Before After"
+              checked={fields.mockuptype === 'Before After'}
+              onChange={handleChange}
+            />
+          </div>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label className="project-title-label" style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>PROJECT TITLE</Form.Label>
+          <Form.Control
+            type="text"
+            name='title'
+            className="project-title-input"
+            placeholder="Enter project title"
+            style={{ height: '50px' }}
+            value={fields.title}
+            onChange={handleChange}
+          />
+        </Form.Group>
+        <div className="d-flex justify-content-between">
+          <Form.Group className="mb-3 me-2 flex-grow-1">
+            <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>DOMAIN</Form.Label>
+            <Form.Control
+              as="select"
+              name='domain'
+              value={fields.domain}
+              onChange={handleChange}
+              className="domain-select"
+              style={{ height: '50px' }}
+            >
+              <option value="">Select Domain</option>
+              <option value="Mobile">Mobile</option>
+              <option value="Moodle">Moodle</option>
+              <option value="WordPress">WordPress</option>
+              <option value="Analytics">Analytics</option>
+              <option value="HRTech">HRTech</option>
+              <option value="EdTech">EdTech</option>
+              <option value="HealthTech">HealthTech</option>
+            </Form.Control>
+          </Form.Group>
+          <Form.Group className="mb-3 ms-2 flex-grow-1">
+            <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>SUBDOMAIN</Form.Label>
+            <Form.Control
+              type="text"
+              name='subdomain'
+              onChange={handleChange}
+              placeholder="Enter Subdomain"
+              style={{ height: '50px' }}
+            />
+          </Form.Group>
+        </div>
+        <Form.Group className="mb-3">
+          <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>DESCRIPTION</Form.Label>
+            <Editor
+              ref={editorRef}
+              onTextChange={handleChange}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>UPLOAD BEFORE DESIGN</Form.Label>
+          <div
+            onClick={() => document.getElementById('file-input').click()}
+            onDrop={handleFileChange}
+            onDragOver={(e) => e.preventDefault()}
+            style={{
+              border: '2px dashed #C2C2C2',
+              borderRadius: '5px',
+              padding: '20px',
+              textAlign: 'center',
+              cursor: 'pointer'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 4, alignItems: 'center' }}>
+              <div style={{ textAlign: 'left' }}>
+                <img src={CloudUpload} alt='' />
               </div>
-            </Form.Group>
-
-            {/* Section 2: Process Selection */}
-            <Form.Group className="mt-3">
-              <Form.Label>
-                <h5 className="modal-title-color">Select Process</h5>
-              </Form.Label>
-              <div className="d-flex gap-4">
-                {processes.map((process) => (
-                  <Form.Check
-                    key={process}
-                    type="radio"
-                    label={process}
-                    name="processOptions"
-                    value={process}
-                    checked={selectedOption === process}
-                    onChange={() => setSelectedOption(process)}
-                  />
-                ))}
+              <div style={{ textAlign: 'left' }}>
+                <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Files</p>
+                <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>PDF, DOC, PPT, JPG, PNG</p>
               </div>
-            </Form.Group>
-
-            {/* Section 3: Upload Deliverables */}
-            <div className="mt-3">
-              <h5 className="modal-title-color my-3">Upload Deliverables</h5>
-              {deliverables.map((deliverable) => (
-                <Row key={deliverable} className="mb-6">
-                  {/* Deliverable Label */}
-                  <div className="d-flex gap-10">
-                    <div className="col-md-4 col-sm-8">
-                      <Col md={12}>
-                        <strong>{deliverable}</strong>
-                      </Col>
-
-                      {/* Text Field */}
-                      <Col md={12} className="d-flex mt-2">
-                        <Form.Control
-                          type="text"
-                          value={currentValue[deliverable] || ""}
-                          placeholder={
-                            uploadItems[deliverable]
-                              ? uploadItems[deliverable].value
-                              : "No file or link uploaded"
-                          }
-                          disabled={!isEditable[deliverable]} // Disable text field in non-editable mode
-                          onChange={(e) =>
-                            setCurrentValue((prev) => ({
-                              ...prev,
-                              [deliverable]: e.target.value,
-                            }))
-                          }
-                          className={`text-field ${
-                            isEditable[deliverable] ? "" : "deactivated"
-                          }`}
-                        />
-
-                        {/* Save Link */}
-                        {isEditable[deliverable] && (
-                          <div
-                            style={{ cursor: "pointer", color: "#28a745" }}
-                            onClick={() => handleSaveLink(deliverable)}
-                          >
-                            <Save style={{ fontSize: "1.8rem" }} />
-                          </div>
-                        )}
-
-                        {/* Delete */}
-                        {uploadItems[deliverable] && (
-                          <div
-                            style={{ cursor: "pointer", color: "#6c63ff" }}
-                            onClick={() => handleDelete(deliverable)}
-                          >
-                            <Delete style={{ fontSize: "1.8rem" }} />
-                          </div>
-                        )}
-                      </Col>
-                    </div>
-                    <div>
-                      {/* Icons for File, Link, Save, and Delete */}
-                      <Col md={12} className="d-flex gap-3 ">
-                        {/* File Upload */}
-                        <div>
-                          <Form.Control
-                            type="file"
-                            id={`file-upload-${deliverable}`}
-                            style={{ display: "none" }}
-                            onChange={(e) => handleFileUpload(deliverable, e)}
-                          />
-                          <label
-                            htmlFor={`file-upload-${deliverable}`}
-                            style={{ cursor: "pointer", color: "#6c757d" }}
-                          >
-                            <CloudUpload
-                              className="upload-icon"
-                              style={{ fontSize: "1.8rem" }}
-                            />
-                          </label>
-                        </div>
-
-                        {/* Link Upload */}
-                        <div
-                          style={{ cursor: "pointer", color: "#6c757d" }}
-                          onClick={() => handleLinkEdit(deliverable)}
-                        >
-                          <Link style={{ fontSize: "1.8rem" }} />
-                        </div>
-                      </Col>
-                    </div>
-                  </div>
-                  <Col md={6}>
-                    <hr className="mt-4 mb-4" />
-                  </Col>
-                </Row>
-              ))}
+              <Form.Control id="file-input" type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
             </div>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer id="process-modal-footer">
-          <Button
-            variant="secondary"
-            style={{ backgroundColor: "transparent", color: "#6E6E6E" }}
-            onClick={handleClose}
+          </div>
+          </Form.Group>
+          <Form.Group className="mb-3">
+          <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>UPLOAD AFTER DESIGN</Form.Label>
+          <div
+            onClick={() => document.getElementById('file-input').click()}
+            onDrop={handleFileChange}
+            onDragOver={(e) => e.preventDefault()}
+            style={{
+              border: '2px dashed #C2C2C2',
+              borderRadius: '5px',
+              padding: '20px',
+              textAlign: 'center',
+              cursor: 'pointer'
+            }}
           >
-            Cancel
-          </Button>
-          <Button
-            style={{ backgroundColor: "#6C67E1", borderColor: "#6C67E1" }}
-            onClick={handleUpload}
-          >
-            Upload
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 4, alignItems: 'center' }}>
+              <div style={{ textAlign: 'left' }}>
+                <img src={CloudUpload} alt='' />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Files</p>
+                <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>PDF, DOC, PPT, JPG, PNG</p>
+              </div>
+              <Form.Control id="file-input" type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
+            </div>
+          </div>
+          </Form.Group>
+        <Form.Group className="mb-3">
+            <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>TAG</Form.Label>
+            <div className="tags-input-container" style={{ display: 'flex', padding: '0.8rem 0.5rem', gap: 4, border: '1px solid #C2C2C2', borderRadius: '16px', flexWrap: 'wrap' }}>
+              {fields.tags?.map((tag, index) => (
+                <div key={index} className="tag-item" style={{ display: 'flex', padding: '0.5rem 0.825rem', backgroundColor: '#F5F5F5', borderRadius: '16px', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className='tags' style={{ marginRight: 3, marginTop: '-2px' }}>{tag}</span>
+                  <div className='close' style={{ background: '#C2C2C2 0% 0% no-repeat padding-box', borderRadius: '50%', display: 'flex', height: '20px', width: '20px', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                    <TimesIcon fontSize='0.5em' style={{ color: '#fff' }} onClick={() => handleTagRemove(index)} className="tag-remove" />
+                  </div>
+                </div>
+              ))}
+              <Form.Control
+                type="text"
+                name='tags'
+                placeholder="Add Tags"
+                onKeyDown={(e) => handleTagInputKeyDown(e)}
+                style={{ border: 'none', outline: 'none', flex: 1, boxShadow: 'none' }}
+              />
+            </div>
+          </Form.Group>
+        <ListGroup>
+          {mockups.map((mockup, index) => (
+            <ListGroup.Item key={index} className="mb-3">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <strong>{mockup.file ? mockup.file.name : mockup.name}</strong>
+                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveFile(index)}>Remove</Button>
+              </div>
+              <Form.Group>
+                <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>Tags</Form.Label>
+                <div>
+                  {tagOptions.map((tag) => (
+                    <Form.Check
+                      inline
+                      type="checkbox"
+                      label={tag}
+                      id={`tag-${index}-${tag}`}
+                      checked={fields.tags ? fields.tags.includes(tag) : false}
+                      onChange={() => handleTagChange(index, tag)}
+                      key={tag}
+                    />
+                  ))}
+                </div>
+              </Form.Group>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+        <Form.Group className="mb-3">
+            <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>TAG</Form.Label>
+            <div className="tags-input-container" style={{ display: 'flex', padding: '0.8rem 0.5rem', gap: 4, border: '1px solid #C2C2C2', borderRadius: '16px', flexWrap: 'wrap' }}>
+              {fields.tags?.map((tag, index) => (
+                <div key={index} className="tag-item" style={{ display: 'flex', padding: '0.5rem 0.825rem', backgroundColor: '#F5F5F5', borderRadius: '16px', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className='tags' style={{ marginRight: 3, marginTop: '-2px' }}>{tag}</span>
+                  <div className='close' style={{ background: '#C2C2C2 0% 0% no-repeat padding-box', borderRadius: '50%', display: 'flex', height: '20px', width: '20px', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                    <TimesIcon fontSize='0.5em' style={{ color: '#fff' }} onClick={() => handleTagRemove(index)} className="tag-remove" />
+                  </div>
+                </div>
+              ))}
+              <Form.Control
+                type="text"
+                name='tags'
+                placeholder="Add Tags"
+                onKeyDown={(e) => handleTagInputKeyDown(e)}
+                style={{ border: 'none', outline: 'none', flex: 1, boxShadow: 'none' }}
+              />
+            </div>
+          </Form.Group>
+        <ListGroup>
+          {mockups.map((mockup, index) => (
+            <ListGroup.Item key={index} className="mb-3">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <strong>{mockup.file ? mockup.file.name : mockup.name}</strong>
+                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveFile(index)}>Remove</Button>
+              </div>
+              <Form.Group>
+                <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>Tags</Form.Label>
+                <div>
+                  {tagOptions.map((tag) => (
+                    <Form.Check
+                      inline
+                      type="checkbox"
+                      label={tag}
+                      id={`tag-${index}-${tag}`}
+                      checked={fields.tags ? fields.tags.includes(tag) : false}
+                      onChange={() => handleTagChange(index, tag)}
+                      key={tag}
+                    />
+                  ))}
+                </div>
+              </Form.Group>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" style={{ backgroundColor: 'transparent', color: '#6E6E6E' }} onClick={handleClose}>Close</Button>
+        <Button style={{ backgroundColor: '#6C67E1', borderColor: '#6C67E1' }} onClick={handleUpload}>Add</Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
