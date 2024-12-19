@@ -14,6 +14,7 @@ import SearchMockup from "./SearchMockup";
 import VisualSample from "../pages/VisualSample";
 
 const NavbarComponent = ({
+  mockups,
   setMockups,
   showModal,
   selectedTabValue,
@@ -290,7 +291,7 @@ const NavbarComponent = ({
             <Tab.Content>
               <Tab.Pane eventKey="visualSample">
                 <SearchMockup setMockups={setMockups} />
-                <VisualSample selectedTabName={selectedTabName} />
+                <VisualSample mockups={mockups} selectedTabName={selectedTabName} />
               </Tab.Pane>
               <Tab.Pane eventKey="caseStudies">
                 <SearchMockup setMockups={setMockups} />
