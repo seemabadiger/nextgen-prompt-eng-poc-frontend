@@ -84,9 +84,10 @@ const DashboardLayout = () => {
           title: mockup.projectTitle,
           description: mockup.projectDescription,
           images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.tags.map((tag) => tag.name),
+          tags: mockup.mockups.map((m) => m.tags),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType,
         }));
         setMockups(fetchedMockups);
         setNoMockupsFound(fetchedMockups.length === 0);
@@ -108,13 +109,17 @@ const DashboardLayout = () => {
   };
 
   const handleShow = () => setShow(true);
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+  };
   const handleTabSelection = (val) => {
     setSelectedTab(val);
   };
 
   const handleUpload = (newMockups) => {
-    setMockups((prev) => [...prev, ...newMockups]);
+    fetchMockups(user.id);
+
+    // setMockups((prev) => [...prev, ...newMockups]);
   };
 
   // const handleSortSelect = (sort) => {
@@ -321,7 +326,7 @@ const DashboardLayout = () => {
         <UploadMockupModal
           show={show}
           handleClose={handleClose}
-          handleUpload={handleUpload}
+          onUpload={handleUpload}
         />
       );
     } else if (selectedTab === "caseStudies") {
@@ -371,10 +376,12 @@ const DashboardLayout = () => {
   return (
     <div>
       <NavbarComponent
+        mockups={mockups}
         setMockups={setMockups}
         showModal={handleShow}
         selectedTabValue={handleTabSelection}
         selectedTabName={tabName}
+
       />
       {renderUpload()}
       {/* <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}

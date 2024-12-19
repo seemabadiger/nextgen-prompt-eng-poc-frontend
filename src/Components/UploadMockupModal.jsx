@@ -23,7 +23,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
   useEffect(() => {
     const fetchMockups = async () => {
       try {
-        const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
+        await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
         // setMockups(response.data);
       } catch (error) {
         console.error('Error fetching mockups:', error);
@@ -31,7 +31,7 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
     };
 
     fetchMockups();
-  }, [user.id]);
+  }, [user]);
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files);
@@ -51,8 +51,8 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
 
   const handleInputChange = (index, e) => {
     const { name, value } = e.target;
-    setMockups(prevMockups => 
-      prevMockups.map((mockup, i) => 
+    setMockups(prevMockups =>
+      prevMockups.map((mockup, i) =>
         i === index ? { ...mockup, [name]: value } : mockup
       )
     );
@@ -75,14 +75,14 @@ const UploadMockupModal = ({ show, handleClose, onUpload }) => {
 
   const handleChange = (e) => {
     if (e.target) {
-      setFields((prevState) => ({ 
-        ...prevState, 
-        [e.target.name]: e.target.value 
+      setFields((prevState) => ({
+        ...prevState,
+        [e.target.name]: e.target.value
       }));
     } else {
-      setFields((prevState) => ({ 
-        ...prevState, 
-        description: editorRef.current.root.innerHTML 
+      setFields((prevState) => ({
+        ...prevState,
+        description: editorRef.current.root.innerHTML
       }));
     }
   };

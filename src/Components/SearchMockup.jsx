@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
-
+import { AuthContext } from '../Context/AuthContext';
 import { Form } from "react-bootstrap";
 
 const SearchMockup = ({ setMockups }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [noMockupsFound, setNoMockupsFound] = useState(false);
   const [emptySearchQuery, setEmptySearchQuery] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -32,6 +33,7 @@ const SearchMockup = ({ setMockups }) => {
           tags: mockup.tags.map((tag) => tag.name),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" }
         }));
         setMockups(searchResults);
         setNoMockupsFound(searchResults.length === 0);

@@ -20,7 +20,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 
-const DomainLayout = (props) => {
+const DomainLayout = ({ tabName, mockupList }) => {
   const { user } = useContext(AuthContext);
   const [selectedMockups, setSelectedMockups] = useState([]);
   const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState(
@@ -60,6 +60,13 @@ const DomainLayout = (props) => {
       });
   };
 
+  useEffect(() => {
+    if (mockupList?.length > 0) {
+      setMockups(mockupList);
+      setNoMockupsFound(false);
+    }
+  }, [mockupList]);
+
   const fetchFavorites = async () => {
     if (!user) return;
 
@@ -92,10 +99,24 @@ const DomainLayout = (props) => {
 
   useEffect(() => {
     if (user) {
-      fetchMockups(user.id);
-      fetchFavorites();
+      // fetchMockups(user.id);
+      // fetchFavorites();
     }
   }, [user]);
+
+  // useEffect(() => {
+  //   // Listener for custom event
+  //   const handlePopupOpen = () => {
+  //     fetchMockups(user.id);
+  //   };
+
+  //   window.addEventListener('newMockup', handlePopupOpen);
+
+  //   // Cleanup listener on unmount
+  //   return () => {
+  //     window.removeEventListener('newMockup', handlePopupOpen);
+  //   };
+  // }, [user]);
 
   // Sort mockups based on selected option
   useEffect(() => {
@@ -262,7 +283,7 @@ const DomainLayout = (props) => {
 
   const handleMockupData = () => {
     const selectedMockups = displayedMockups?.filter(
-      (res) => res?.mockupType?.name === props.tabName
+      (res) => res?.mockupType?.name === tabName
     );
     return (selectedMockups || []).map((mockup) => (
       <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
@@ -335,9 +356,8 @@ const DomainLayout = (props) => {
               }}
               key={domain}
               variant="outline-secondary"
-              className={`me-2 ${
-                activeButton === domain ? "active-button" : ""
-              }`}
+              className={`me-2 ${activeButton === domain ? "active-button" : ""
+                }`}
               onClick={() => handleDomainFilter(domain)}
             >
               {domain}
