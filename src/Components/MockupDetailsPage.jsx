@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Container, Carousel, Row, Col, Button, Modal } from 'react-bootstrap';
 import HeaderComponent from './HeaderComponent';
 import leftImg from '../assets/left.svg';
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete"; // Import delete icon
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from 'axios';
+import EditMockupModal from './EditMockupModal'; // Import the EditMockupModal component
 
 const MockupDetailsPage = () => {
     const { state } = useLocation();
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
+    const { id } = useParams();
     const { mockup } = state;
     const [activeIndex, setActiveIndex] = useState(0);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState('');
+    const [showEditModal, setShowEditModal] = useState(false); // State to manage the visibility of the edit modal
 
     if (!mockup) return <div>Mockup not found</div>;
-
+    
     const handleSelect = (selectedIndex) => {
         setActiveIndex(selectedIndex);
     };
@@ -29,8 +32,7 @@ const MockupDetailsPage = () => {
     };
 
     const handleEdit = () => {
-        // Implement edit functionality
-        console.log('Edit clicked for mockup:', mockup.id);
+        setShowEditModal(true); // Show the edit modal when the edit button is clicked
     };
 
     const confirmDelete = () => {
@@ -52,7 +54,6 @@ const MockupDetailsPage = () => {
 
         } catch (error) {
             console.error('Error deleting mockup:', error);
-            // alert('Failed to delete mockup. Please try again.');
             setDeleteError('Failed to delete mockup. Please try again.');
         } finally {
             setIsDeleting(false);
@@ -61,6 +62,12 @@ const MockupDetailsPage = () => {
     };
 
     const handleCloseDeleteModal = () => setShowDeleteModal(false);
+
+    const handleUpdate = (updatedMockup) => {
+        // Handle the updated mockup data here
+        console.log('Updated mockup:', updatedMockup);
+        setShowEditModal(false); // Close the edit modal after update
+    };
 
     // Style for expanded view
     const expandedStyle = {
@@ -82,7 +89,7 @@ const MockupDetailsPage = () => {
         maxHeight: '100%',
         objectFit: 'contain',
     };
-
+console.log('mockuppppppppppp',mockup);
     return (
         <Container fluid className="p-4">
             <HeaderComponent showModal={() => { }} />
@@ -155,7 +162,7 @@ const MockupDetailsPage = () => {
                     <h5 className="mt-4">{mockup.domainname} | {mockup.subdomainname}</h5>
                     <p>Contrary to popular belief, Lorem Ipsum is not simply random text...</p>
                     <h5 className="mt-4">About Project</h5>
-                    <p>{mockup.description}</p>
+                    <p> {mockup.description} </p>
                     <h5 className="mt-4">About Screen</h5>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
                 </Col>
@@ -195,6 +202,15 @@ const MockupDetailsPage = () => {
                     />
                 </div>
             )}
+
+            {/* Edit Modal */}
+            <EditMockupModal
+                show={showEditModal}
+                handleClose={() => setShowEditModal(false)}
+                onUpdate={handleUpdate}
+                mockup={mockup} // Pass the mockup data to the EditMockupModal
+                mockupId={id}
+            />
         </Container>
     );
 };

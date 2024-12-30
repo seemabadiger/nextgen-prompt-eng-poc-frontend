@@ -30,8 +30,9 @@ const App = () => {
               {/* <Route path="/admin" element={<ProtectedRoute roles="ADMIN"><AdminDashboard /></ProtectedRoute>} /> */}
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="*" element={<NotFound />} />
+            
             <Route path="/mockup/:id" element={<MockupDetailsPage />} />{" "}
+            <Route path="*" element={<NotFound />} />
             {/* Add route for MockupDetailsPage */}
             {/* <Route path="/temp" element={<DashboardLayout />} /> */}
           </Routes>

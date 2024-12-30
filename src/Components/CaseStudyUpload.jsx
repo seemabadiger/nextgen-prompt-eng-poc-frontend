@@ -1,148 +1,208 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef,useContext } from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import axios from 'axios';
 import CloudUpload from "../assets/cloud-upload.svg";
 import TimesIcon from '@mui/icons-material/Close'
+import Editor from './Editor';
 import { AuthContext } from '../Context/AuthContext';
 
 const CaseStudyUpload = ({ show, handleClose, onUpload }) => {
   const { user } = useContext(AuthContext);
-  const [mockups, setMockups] = useState([]);
+const [mockups, setMockups] = useState([]);
+const [caseStudyFiles, setCaseStudyFiles] = useState([]);
+  const [thumbnailImages, setThumbnailImages] = useState([]);
   const [fields, setFields] = useState({
     mockuptype: '',
     title: '',
     domain: '',
     subdomain: '',
-    caseStudyFile: null,
-    thumbnailImage: null,
+    description: '',
     tags: []
   });
+  const editorRef = useRef(null);
   const tagOptions = ['Mobile', 'Web', 'Desktop', 'Tablet'];
-  const [loading, setLoading] = useState(false);
+  const handleCaseStudyFileChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    // Use functional update to append new files to existing ones
+    setCaseStudyFiles(prevFiles => {
+      // Create a Set to prevent duplicate files
+      const updatedFiles = new Set([...prevFiles, ...newFiles]);
+      return Array.from(updatedFiles);
+    });
+  };
+
+  const handleThumbnailImageChange = (e) => {
+    const newImages = Array.from(e.target.files);
+    // Use functional update to append new images to existing ones
+    setThumbnailImages(prevImages => {
+      // Create a Set to prevent duplicate images
+      const updatedImages = new Set([...prevImages, ...newImages]);
+      return Array.from(updatedImages);
+    });
+  };
+  const handleRemoveCaseStudyFile = (index) => {
+    setCaseStudyFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveThumbnailImage = (index) => {
+    setThumbnailImages(prevImages => prevImages.filter((_, i) => i !== index));
+  };
 
   // Fetch mockup data on component mount
   useEffect(() => {
     const fetchMockups = async () => {
-    //   try {
-    //     const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
-    //     //setMockups(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching mockups:', error);
-    //   }
+      try {
+        const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`);
+        //setMockups(response.data);
+      } catch (error) {
+        console.error('Error fetching mockups:', error);
+      }
     };
 
     fetchMockups();
   }, []);
 
-//   const handleFileChange = (e, fieldName) => {
-//     setFields((prevState) => ({
-//       ...prevState,
-//       [fieldName]: e.target.files[0]
-//     }));
-//   };
-
-const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setFields({ ...fields, [name]: files[0] });
+  const handleFileChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    const newMockups = newFiles.map(file => ({
+      file,
+      title: '',
+      domain:'',
+      subdomain:'',
+      tags: [] // Initialize as an empty array
+    }));
+    setMockups(newFiles);
   };
 
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFields((prevState) => ({
-//       ...prevState,
-//       [name]: value
-//     }));
-//   };
-const handleInputChange = (e) => {
+  const handleInputChange = (index, e) => {
     const { name, value } = e.target;
-    setFields({ ...fields, [name]: value });
+    setMockups(prevMockups => 
+      prevMockups.map((mockup, i) => 
+        i === index ? { ...mockup, [name]: value } : mockup
+      )
+    );
   };
 
   const handleTagChange = (tag) => {
-    setFields((prevState) => ({
-      ...prevState,
-      tags: prevState.tags.includes(tag) ? prevState.tags.filter(t => t !== tag) : [...prevState.tags, tag]
+    setFields((prevState) => ({ 
+      ...prevState, 
+      tags: fields.tags.includes(tag) 
+        ? fields.tags.filter(t => t !== tag) 
+        : [...fields.tags, tag]
     }));
   };
 
+  const handleRemoveFile = (index) => {
+    setMockups(prevMockups => prevMockups.filter((_, i) => i !== index));
+  };
+
+  const handleChange = (e) => {
+    if (e.target) {
+      setFields((prevState) => ({ 
+        ...prevState, 
+        [e.target.name]: e.target.value 
+      }));
+    }
+  };
+
   const handleUpload = async () => {
+    // if (mockups.length === 0) {
+    //   alert('Please add at least one file.');
+    //   return;
+    // }
+    if (caseStudyFiles.length === 0) {
+        alert('Please upload at least one case study file.');
+        return;
+      }
+  
+      if (thumbnailImages.length === 0) {
+        alert('Please upload at least one thumbnail image.');
+        return;
+      }
     try {
+      const uploadPromises = mockups.map(mockup => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            resolve({
+              ...mockup,
+              image: e.target.result,
+              fileName: mockup.filename
+            });
+          };
+          reader.readAsDataURL(mockup);
+        });
+
+      });
+
+      const newMockups = await Promise.all(uploadPromises);
       const formData = new FormData();
+    //   mockups.forEach((mockup, index) => {
+    //     formData.append('MockupFiles', mockup);
+    //   });
+    // Append case study files
+    caseStudyFiles.forEach((file) => {
+        formData.append('CaseStudyFiles', file);
+      });
+      
+      // Append all thumbnail images
+      thumbnailImages.forEach((image) => {
+        formData.append('ThumbnailImages', image);
+      });
       formData.append('MockupType', fields.mockuptype);
       formData.append('ProjectTitle', fields.title);
-      formData.append('DomainName', fields.domain);
+      formData.append('DomainName', fields.domain );
       formData.append('SubdomainName', fields.subdomain);
-      formData.append('CaseStudyFile', fields.caseStudyFile);
-      formData.append('ThumbnailImage', fields.thumbnailImage);
-      fields.tags.forEach((tag) => {
-        formData.append(`Tags`, tag);
+      formData.append(`ImageGroupId`, '');
+      formData.append('ProjectDescription','abcd');
+        fields.tags.forEach((tag) => {
+          formData.append(`Tags`, tag);
+        });
+
+        await axios.post(
+            `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/uploadcasestudy?userId=${user.id}`,
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+      alert('Files uploaded sucessfully.');
+     onUpload({
+        caseStudyFiles,
+        thumbnailImages
       });
-  
-      await axios.post(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/upload?userId=${user.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      alert('Files uploaded successfully.');
-      onUpload();
       handleClose();
+    //  setMockups([]);
+    setCaseStudyFiles([]);
+      setThumbnailImages([]);
+    // window.location.reload();
+
     } catch (error) {
-      console.error('Error uploading files:', error);
+    console.error('Error uploading files:', error);
+    //  alert('An error occurred while uploading the files.');
     }
+    handleClose();
   };
-
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('mockuptype', fields.mockuptype);
-    formData.append('title', fields.title);
-    formData.append('domain', fields.domain);
-    formData.append('subdomain', fields.subdomain);
-    formData.append('caseStudyFile', fields.caseStudyFile);
-    formData.append('thumbnailImage', fields.thumbnailImage);
-    formData.append('tags', JSON.stringify(fields.tags));
-
-    try {
-      const response = await axios.post(
-        'https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/uploadcasestudy',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      onUpload(response.data); // Callback for success
-      alert('Upload successful!');
-    } catch (error) {
-      console.error('Error uploading case study:', error);
-      alert('Failed to upload the case study.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
 
   const handleTagRemove = (index) => {
-    setFields((prevState) => ({
-      ...prevState,
-      tags: prevState.tags.filter((t, i) => i !== index)
+    setFields((prevState) => ({ 
+      ...prevState, 
+      tags: prevState.tags.filter((_, i) => i !== index) 
     }));
   };
 
   const handleTagInputKeyDown = (e) => {
     if (e.key === 'Enter' && e.target.value.trim() !== '') {
       const newTag = e.target.value.trim();
-      setFields((prevState) => ({
-        ...prevState,
-        tags: [...prevState.tags, newTag]
+      setFields((prevState) => ({ 
+        ...prevState, 
+        tags: [...prevState.tags, newTag] 
       }));
       e.target.value = '';
     }
   };
-
   useEffect(() => {
     if (show) {
       setFields({
@@ -150,20 +210,23 @@ const handleSubmit = async (e) => {
         title: '',
         domain: '',
         subdomain: '',
-        caseStudyFile: null,
-        thumbnailImage: null,
+        description: '',
         tags: []
       });
+    //   setMockups([]);
+    setCaseStudyFiles([]);
+      setThumbnailImages([]);
     }
   }, [show]);
+  
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Upload</Modal.Title>
+        <Modal.Title>Add New Mock-up</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form.Group className="mb-4">
+      <Form.Group className="mb-4">
           <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>
             SELECT SECTION
           </Form.Label>
@@ -175,7 +238,7 @@ const handleSubmit = async (e) => {
               name="mockuptype"
               value="Visual Samples"
               checked={fields.mockuptype === 'Visual Samples'}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="me-3"
             />
             <Form.Check
@@ -185,7 +248,7 @@ const handleSubmit = async (e) => {
               name="mockuptype"
               value="Case Studies"
               checked={fields.mockuptype === 'Case Studies'}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="me-3"
             />
             <Form.Check
@@ -195,7 +258,7 @@ const handleSubmit = async (e) => {
               name="mockuptype"
               value="Process Diagram & Artifacts"
               checked={fields.mockuptype === 'Process Diagram & Artifacts'}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="me-3"
             />
             <Form.Check
@@ -205,7 +268,7 @@ const handleSubmit = async (e) => {
               name="mockuptype"
               value="Before After"
               checked={fields.mockuptype === 'Before After'}
-              onChange={handleInputChange}
+              onChange={handleChange}
             />
           </div>
         </Form.Group>
@@ -219,7 +282,7 @@ const handleSubmit = async (e) => {
             placeholder="Enter project title"
             style={{ height: '50px' }}
             value={fields.title}
-            onChange={handleInputChange}
+            onChange={handleChange}
           />
         </Form.Group>
         <div className="d-flex justify-content-between">
@@ -229,7 +292,7 @@ const handleSubmit = async (e) => {
               as="select"
               name='domain'
               value={fields.domain}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="domain-select"
               style={{ height: '50px' }}
             >
@@ -248,45 +311,25 @@ const handleSubmit = async (e) => {
             <Form.Control
               type="text"
               name='subdomain'
-              onChange={handleInputChange}
+              onChange={handleChange}
               placeholder="Enter Subdomain"
               style={{ height: '50px' }}
             />
           </Form.Group>
         </div>
+        {/* <Form.Group className="mb-3">
+          <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>DESCRIPTION</Form.Label>
+            <Editor
+              ref={editorRef}
+              onTextChange={handleChange}
+          />
+        </Form.Group> */}
         <Form.Group className="mb-3">
-          <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>Upload Case Study File</Form.Label>
-          <div className="upload-container" style={{
-            border: '2px dashed #C2C2C2',
-            borderRadius: '5px',
-            padding: '20px',
-            textAlign: 'center',
-            cursor: 'pointer'
-          }}>
-            <input
-              id="case-study-file-input"
-              type="file"
-              onChange={(e) => handleFileChange(e, 'caseStudyFile')}
-              style={{ display: 'none' }}
-            />
-            <label htmlFor="case-study-file-input" className="upload-label" style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 8
-            }}>
-              <img src={CloudUpload} alt='' />
-              <div>
-                <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Case Study File</p>
-                <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>PDF, DOC, PPT</p>
-              </div>
-            </label>
-          </div>
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>Upload Thumbnail Image</Form.Label>
+          <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>UPLOAD CASE STUDY FILE</Form.Label>
           <div
-            onClick={() => document.getElementById('thumbnail-image-input').click()}
+            onClick={() => document.getElementById('case-study-file-input').click()}
+            onDrop={handleFileChange}
+            onDragOver={(e) => e.preventDefault()}
             style={{
               border: '2px dashed #C2C2C2',
               borderRadius: '5px',
@@ -300,14 +343,70 @@ const handleSubmit = async (e) => {
                 <img src={CloudUpload} alt='' />
               </div>
               <div style={{ textAlign: 'left' }}>
-                <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Thumbnail Image</p>
-                <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>JPG, PNG</p>
+                <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Files</p>
+                <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>PDF,PPT</p>
               </div>
-              <Form.Control id="thumbnail-image-input" type="file" onChange={(e) => handleFileChange(e, 'thumbnailImage')} style={{ display: 'none' }} />
+              <Form.Control id="case-study-file-input" type="file" multiple onChange={handleCaseStudyFileChange} style={{ display: 'none' }} />
             </div>
           </div>
-        </Form.Group>
-        <Form.Group className="mb-3">
+
+          <ListGroup className="mt-2">
+            {caseStudyFiles.map((file, index) => (
+              <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                {file.name}
+                <Button 
+                  variant="outline-danger" 
+                  size="sm" 
+                  onClick={() => handleRemoveCaseStudyFile(index)}
+                >
+                  Remove
+                </Button>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+          </Form.Group>
+          <Form.Group className="mb-3">
+          <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>UPLOAD THUMBNAIL IMAGE</Form.Label>
+          <div
+            onClick={() => document.getElementById('thumbnail-image-input').click()}
+            onDrop={handleFileChange}
+            onDragOver={(e) => e.preventDefault()}
+            style={{
+              border: '2px dashed #C2C2C2',
+              borderRadius: '5px',
+              padding: '20px',
+              textAlign: 'center',
+              cursor: 'pointer'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 4, alignItems: 'center' }}>
+              <div style={{ textAlign: 'left' }}>
+                <img src={CloudUpload} alt='' />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Files</p>
+                <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>JPG, PNG</p>
+              </div>
+              <Form.Control id="thumbnail-image-input" type="file" multiple onChange={handleThumbnailImageChange} style={{ display: 'none' }} />
+            </div>
+          </div>
+
+          <ListGroup className="mt-2">
+            {thumbnailImages.map((image, index) => (
+              <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                {image.name}
+                <Button 
+                  variant="outline-danger" 
+                  size="sm" 
+                  onClick={() => handleRemoveThumbnailImage(index)}
+                >
+                  Remove
+                </Button>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+          </Form.Group>
+          <Form.Group className="mb-3">
           <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>TAG</Form.Label>
           <div className="tags-input-container" style={{ display: 'flex', padding: '0.8rem 0.5rem', gap: 4, border: '1px solid #C2C2C2', borderRadius: '16px', flexWrap: 'wrap' }}>
             {fields.tags?.map((tag, index) => (
@@ -327,6 +426,32 @@ const handleSubmit = async (e) => {
             />
           </div>
         </Form.Group>
+        <ListGroup>
+          {mockups.map((mockup, index) => (
+            <ListGroup.Item key={index} className="mb-3">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <strong>{mockup.file ? mockup.file.name : mockup.name}</strong>
+                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveFile(index)}>Remove</Button>
+              </div>
+              <Form.Group>
+                <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>Tags</Form.Label>
+                <div>
+                  {tagOptions.map((tag) => (
+                    <Form.Check
+                      inline
+                      type="checkbox"
+                      label={tag}
+                      id={`tag-${index}-${tag}`}
+                      checked={fields.tags ? fields.tags.includes(tag) : false}
+                      onChange={() => handleTagChange(index, tag)}
+                      key={tag}
+                    />
+                  ))}
+                </div>
+              </Form.Group>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" style={{ backgroundColor: 'transparent', color: '#6E6E6E' }} onClick={handleClose}>Close</Button>

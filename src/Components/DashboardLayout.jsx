@@ -84,11 +84,12 @@ const DashboardLayout = () => {
           title: mockup.projectTitle,
           description: mockup.projectDescription,
           images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.mockups.map((m) => m.tags),
+          tags: mockup.mockups.flatMap((m) => m.tags.split(',')),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
           mockupType: mockup.mockupType,
         }));
+        
         setMockups(fetchedMockups);
         setNoMockupsFound(fetchedMockups.length === 0);
       })

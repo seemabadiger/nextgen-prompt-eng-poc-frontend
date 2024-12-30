@@ -8,7 +8,10 @@ import { AuthContext } from '../Context/AuthContext';
 
 const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
   const { user } = useContext(AuthContext);
-  const [mockups, setMockups] = useState([]);
+   const [mockups, setMockups] = useState([]);
+  const [beforeFiles, setBeforeFiles] = useState([]);
+  const [afterFiles, setAfterFiles] = useState([]);
+
   const [fields, setFields] = useState({
     mockuptype: '',
     title: '',
@@ -20,17 +23,41 @@ const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
   const editorRef = useRef(null);
   const tagOptions = ['Mobile', 'Web', 'Desktop', 'Tablet'];
 
-  const handleFileChange = (e) => {
+  // const handleFileChange = (e) => {
+  //   const newFiles = Array.from(e.target.files);
+  //   const newMockups = newFiles.map((file) => ({
+  //     file,
+  //     title: '',
+  //     domain: '',
+  //     subdomain: '',
+  //     tags: [], // Initialize as an empty array
+  //   }));
+  //   setMockups(newFiles);
+  // };
+   // Handle file upload for Before Design
+   const handleBeforeFileChange = (e) => {
     const newFiles = Array.from(e.target.files);
-    const newMockups = newFiles.map((file) => ({
+    const processedFiles = newFiles.map((file) => ({
       file,
       title: '',
       domain: '',
       subdomain: '',
-      tags: [], // Initialize as an empty array
+      tags: [],
     }));
-    setMockups(newFiles);
+    setBeforeFiles(processedFiles);
   };
+  const handleAfterFileChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    const processedFiles = newFiles.map((file) => ({
+      file,
+      title: '',
+      domain: '',
+      subdomain: '',
+      tags: [],
+    }));
+    setAfterFiles(processedFiles);
+  };
+  
 
   const handleInputChange = (index, e) => {
     const { name, value } = e.target;
@@ -50,8 +77,17 @@ const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
     }));
   };
 
-  const handleRemoveFile = (index) => {
-    setMockups((prevMockups) => prevMockups.filter((_, i) => i !== index));
+  // const handleRemoveFile = (index) => {
+  //   setMockups((prevMockups) => prevMockups.filter((_, i) => i !== index));
+  // };
+   // Remove file from Before Design
+   const handleRemoveBeforeFile = (index) => {
+    setBeforeFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  // Remove file from After Design
+  const handleRemoveAfterFile = (index) => {
+    setAfterFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   const handleChange = (e) => {
@@ -68,60 +104,99 @@ const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
     }
   };
 
-  const handleUpload = async () => {
-    if (mockups.length === 0) {
-      alert('Please add at least one file.');
-      return;
-    }
-
-    try {
-      const uploadPromises = mockups.map((mockup) => {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            resolve({
-              ...mockup,
-              image: e.target.result,
-              fileName: mockup.file.name,
-            });
-          };
-          reader.readAsDataURL(mockup.file);
+    // Handle upload of files
+    const handleUpload = async () => {
+      if (beforeFiles.length === 0 || afterFiles.length === 0) {
+        alert('Please add at least one file for both Before and After designs.');
+        return;
+      }
+  
+      try {
+        // Process Before Design Files
+        const beforeUploadPromises = beforeFiles.map((file) => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              resolve({
+                ...file,
+                image: e.target.result,
+                fileName: file.file.name,
+              });
+            };
+            reader.readAsDataURL(file.file);
+          });
         });
-      });
-
-      const newMockups = await Promise.all(uploadPromises);
-      const formData = new FormData();
-      mockups.forEach((mockup, index) => {
-        formData.append('MockupFiles', mockup.file);
-      });
-      formData.append('MockupType', fields.mockuptype);
-      formData.append('ProjectTitle', fields.title);
-      formData.append('DomainName', fields.domain);
-      formData.append('SubdomainName', fields.subdomain);
-      formData.append('ImageGroupId', '');
-      formData.append('ProjectDescription', fields.description);
-      fields.tags.forEach((tag) => {
-        formData.append('Tags', tag);
-      });
-
-      await axios.post(
-        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/uploadbeforeafter?userId=${user.id}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-      alert('Files uploaded successfully.');
-      onUpload(newMockups);
-      handleClose();
-      setMockups([]);
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      alert('An error occurred while uploading the files.');
-    }
-  };
+  
+        // Process After Design Files
+        const afterUploadPromises = afterFiles.map((file) => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              resolve({
+                ...file,
+                image: e.target.result,
+                fileName: file.file.name,
+              });
+            };
+            reader.readAsDataURL(file.file);
+          });
+        });
+  
+        // Resolve all file uploads
+        const processedBeforeFiles = await Promise.all(beforeUploadPromises);
+        const processedAfterFiles = await Promise.all(afterUploadPromises);
+  
+        // Prepare FormData
+        const formData = new FormData();
+        
+        // Append Before Design Files
+        beforeFiles.forEach((file) => {
+          formData.append('BeforeDesignFiles', file.file);
+        });
+  
+        // Append After Design Files
+        afterFiles.forEach((file) => {
+          formData.append('AfterDesignFiles', file.file);
+        });
+  
+        // Append other form fields
+        formData.append('MockupType', fields.mockuptype);
+        formData.append('ProjectTitle', fields.title);
+        formData.append('DomainName', fields.domain);
+        formData.append('SubdomainName', fields.subdomain);
+        formData.append('ImageGroupId', '');
+        formData.append('ProjectDescription', fields.description);
+        
+        // Append tags
+        fields.tags.forEach((tag) => {
+          formData.append('Tags', tag);
+        });
+  
+        // Upload to server
+        await axios.post(
+          `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/uploadbeforeafter?userId=${user.id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+  
+        alert('Files uploaded successfully.');
+        
+        // Combine processed files for onUpload callback
+        onUpload([...processedBeforeFiles, ...processedAfterFiles]);
+        handleClose();
+        
+        // Reset files
+        setBeforeFiles([]);
+        setAfterFiles([]);
+      } catch (error) {
+        console.error('Error uploading files:', error);
+        alert('An error occurred while uploading the files.');
+      }
+    };
 
   const handleTagRemove = (index) => {
     setFields((prevState) => ({
@@ -262,8 +337,8 @@ const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
         <Form.Group className="mb-3">
           <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>UPLOAD BEFORE DESIGN</Form.Label>
           <div
-            onClick={() => document.getElementById('file-input').click()}
-            onDrop={handleFileChange}
+            onClick={() => document.getElementById('before-file-input').click()}
+            // onDrop={handleFileChange}
             onDragOver={(e) => e.preventDefault()}
             style={{
               border: '2px dashed #C2C2C2',
@@ -281,15 +356,27 @@ const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
                 <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Files</p>
                 <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>PDF, DOC, PPT, JPG, PNG</p>
               </div>
-              <Form.Control id="file-input" type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
+              <Form.Control id="before-file-input" type="file" multiple onChange={handleBeforeFileChange} style={{ display: 'none' }} />
             </div>
           </div>
           </Form.Group>
+{/* Before Design Files List */}
+<ListGroup>
+        {beforeFiles.map((file, index) => (
+          <ListGroup.Item key={index} className="mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <strong>{file.file.name}</strong>
+              <Button variant="outline-danger" size="sm" onClick={() => handleRemoveBeforeFile(index)}>Remove</Button>
+            </div>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+
           <Form.Group className="mb-3">
           <Form.Label style={{ fontSize: '1.2rem', color: '#6E6E6E', fontWeight: 'bold' }}>UPLOAD AFTER DESIGN</Form.Label>
           <div
-            onClick={() => document.getElementById('file-input').click()}
-            onDrop={handleFileChange}
+            onClick={() => document.getElementById('after-file-input').click()}
+            // onDrop={handleFileChange}
             onDragOver={(e) => e.preventDefault()}
             style={{
               border: '2px dashed #C2C2C2',
@@ -307,10 +394,26 @@ const BeforeAfterUpload = ({ show, handleClose, onUpload }) => {
                 <p style={{ fontSize: '1rem', fontWeight: 'bold', color: '#6E6E6E', marginBottom: 1 }}>Upload Files</p>
                 <p style={{ fontSize: '0.875rem', color: '#6E6E6E', marginBottom: 1 }}>PDF, DOC, PPT, JPG, PNG</p>
               </div>
-              <Form.Control id="file-input" type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
+              <Form.Control 
+              id="after-file-input" 
+              type="file" multiple 
+              onChange={handleAfterFileChange} 
+              style={{ display: 'none' }} />
             </div>
           </div>
           </Form.Group>
+
+          {/* After Design Files List */}
+      <ListGroup>
+        {afterFiles.map((file, index) => (
+          <ListGroup.Item key={index} className="mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <strong>{file.file.name}</strong>
+              <Button variant="outline-danger" size="sm" onClick={() => handleRemoveAfterFile(index)}>Remove</Button>
+            </div>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
         <Form.Group className="mb-3">
             <Form.Label style={{ fontSize: '0.875rem', color: '#6E6E6E', fontWeight: 'bold' }}>TAG</Form.Label>
             <div className="tags-input-container" style={{ display: 'flex', padding: '0.8rem 0.5rem', gap: 4, border: '1px solid #C2C2C2', borderRadius: '16px', flexWrap: 'wrap' }}>
