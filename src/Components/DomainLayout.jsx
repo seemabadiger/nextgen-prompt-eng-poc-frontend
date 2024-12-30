@@ -27,7 +27,7 @@ const DomainLayout = ({ tabName, mockupList }) => {
     []
   );
 
-  const [activeButton, setActiveButton] = useState("");
+  const [activeButton, setActiveButton] = useState("All"); // Default to "All"
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
@@ -35,30 +35,6 @@ const DomainLayout = ({ tabName, mockupList }) => {
   const [mockups, setMockups] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const navigate = useNavigate(); // Use useNavigate hook
-  const fetchMockups = (userId) => {
-    axios
-      .get(
-        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`
-      )
-      .then((response) => {
-        const fetchedMockups = response.data.map((mockup) => ({
-          id: mockup.id,
-          title: mockup.projectTitle,
-          description: mockup.projectDescription,
-          images: mockup.mockups.map((m) => m.filePath),
-          // tags: mockup.tags.map((tag) => tag.name),
-          tags: mockup.mockups.map((m) => m.tags),
-          domainname: mockup.domain.name,
-          subdomainname: mockup.subdomain.name,
-          mockupType: mockup.mockupType,
-        }));
-        setMockups(fetchedMockups);
-        setNoMockupsFound(fetchedMockups.length === 0);
-      })
-      .catch((error) => {
-        console.error("Error fetching mockups:", error);
-      });
-  };
 
   useEffect(() => {
     if (mockupList?.length > 0) {
@@ -104,20 +80,6 @@ const DomainLayout = ({ tabName, mockupList }) => {
     }
   }, [user]);
 
-  // useEffect(() => {
-  //   // Listener for custom event
-  //   const handlePopupOpen = () => {
-  //     fetchMockups(user.id);
-  //   };
-
-  //   window.addEventListener('newMockup', handlePopupOpen);
-
-  //   // Cleanup listener on unmount
-  //   return () => {
-  //     window.removeEventListener('newMockup', handlePopupOpen);
-  //   };
-  // }, [user]);
-
   // Sort mockups based on selected option
   useEffect(() => {
     if (sortOption) {
@@ -157,66 +119,18 @@ const DomainLayout = ({ tabName, mockupList }) => {
   const handleDomainFilter = (domainName) => {
     setActiveButton(domainName);
     setShowFavorites(false); // Reset showFavorites state
-    axios
-      .get(
-        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/searchByDomain?userId=${user.id}&domainName=${domainName}`
-      )
-      .then((response) => {
-        const filteredMockups = response.data.map((mockup) => ({
-          id: mockup.id,
-          title: mockup.projectTitle,
-          description: mockup.projectDescription,
-          images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.tags.map((tag) => tag.name),
-          domainname: mockup.domain.name,
-          subdomainname: mockup.subdomain.name,
-          mockupType: mockup.mockupType,
-        }));
-        setMockups(filteredMockups);
-        setNoMockupsFound(filteredMockups.length === 0);
-      })
-      .catch((error) => {
-        console.error("Error fetching filtered mockups:", error);
-        setMockups([]);
-        setNoMockupsFound(true);
-      });
+    if (domainName === "All") {
+      setMockups(mockupList);
+      setNoMockupsFound(mockupList.length === 0);
+    } else {
+      const filteredMockups = mockupList.filter(
+        (mockup) => mockup.domainname === domainName
+      );
+      console.log("Filtered Mockups:", filteredMockups); // Debugging log
+      setMockups(filteredMockups);
+      setNoMockupsFound(filteredMockups.length === 0);
+    }
   };
-
-  // const handleDelete = (mockup) => {
-  //   axios
-  //     .delete(
-  //       `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/delete/${mockup.id}`
-  //     )
-  //     .then(() => {
-  //       setMockups((prevMockups) =>
-  //         prevMockups.filter((item) => item.id !== mockup.id)
-  //       );
-  //       console.log("Mockup deleted successfully");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error deleting mockup:", error);
-  //     });
-  // };
-
-  // const handleUpdate = (mockup) => {
-  //   setSelectedMockup(mockup);
-  //   setUpdateForm({
-  //     Name: mockup.description,
-  //     Tags: mockup.tags || [],
-  //     Domainname: mockup.domainname,
-  //     Subdomainname: mockup.subdomainname,
-  //     Image: mockup.images[0], // Assuming the first image is the main image
-  //   });
-  //   setUpdateModalShow(true);
-  // };
-
-  // const handleUpdateFormChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setUpdateForm((prevForm) => ({
-  //     ...prevForm,
-  //     [name]: value,
-  //   }));
-  // };
 
   const handleSortSelect = (sort) => {
     setSortOption(sort);
@@ -230,6 +144,7 @@ const DomainLayout = ({ tabName, mockupList }) => {
     axios
       .get(apiUrl)
       .then((response) => {
+        console.log("API Response:", response.data); // Debugging log
         const sortedMockups = response.data.map((mockup) => ({
           id: mockup.id,
           title: mockup.projectTitle,
@@ -264,6 +179,8 @@ const DomainLayout = ({ tabName, mockupList }) => {
     ? mockups.filter((mockup) => favorites.includes(mockup.id))
     : mockups;
 
+  console.log("Displayed Mockups:", displayedMockups); // Debugging log
+
   const handleCheckboxChange = (e, mockupId) => {
     e.stopPropagation(); // Stop event propagation to prevent card click
     let selected = [];
@@ -285,6 +202,7 @@ const DomainLayout = ({ tabName, mockupList }) => {
     const selectedMockups = displayedMockups?.filter(
       (res) => res?.mockupType?.name === tabName
     );
+    console.log("Selected Mockups for Rendering:", selectedMockups); // Debugging log
     return (selectedMockups || []).map((mockup) => (
       <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
         <Card className="template-card" onClick={() => handleCardClick(mockup)}>
