@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
 import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 // import AdminPage from './pages/AdminPage';
@@ -30,13 +31,25 @@ const App = () => {
               {/* <Route path="/admin" element={<ProtectedRoute roles="ADMIN"><AdminDashboard /></ProtectedRoute>} /> */}
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
-            
             <Route path="/mockup/:id" element={<MockupDetailsPage />} />{" "}
             <Route path="*" element={<NotFound />} />
             {/* Add route for MockupDetailsPage */}
             {/* <Route path="/temp" element={<DashboardLayout />} /> */}
           </Routes>
         </BrowserRouter>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          // transition={Bounce}
+        />
       </ErrorBoundary>
     </AuthProvider>
   );

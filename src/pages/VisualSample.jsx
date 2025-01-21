@@ -6,7 +6,10 @@ import DomainLayout from "../Components/DomainLayout";
 const VisualSample = (props) => {
   return (
     <div className="container-fluid px-0">
-      <DomainLayout tabName={props?.selectedTabName} mockupList={props?.mockups} />
+      <DomainLayout
+        tabName={props?.selectedTabName}
+        mockupList={props?.mockups}
+      />
     </div>
   );
 };

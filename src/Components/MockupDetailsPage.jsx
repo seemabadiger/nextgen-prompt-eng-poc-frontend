@@ -13,8 +13,8 @@ const MockupDetailsPage = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
     const { id } = useParams();
-    const { mockup } = state;
-    const [activeIndex, setActiveIndex] = useState(0);
+    const { mockup, index } = state;
+    const [activeIndex, setActiveIndex] = useState(index || 0);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -22,7 +22,6 @@ const MockupDetailsPage = () => {
     const [showEditModal, setShowEditModal] = useState(false); // State to manage the visibility of the edit modal
 
     if (!mockup) return <div>Mockup not found</div>;
-    
     const handleSelect = (selectedIndex) => {
         setActiveIndex(selectedIndex);
     };
@@ -89,7 +88,7 @@ const MockupDetailsPage = () => {
         maxHeight: '100%',
         objectFit: 'contain',
     };
-console.log('mockuppppppppppp',mockup);
+
     return (
         <Container fluid className="p-4">
             <HeaderComponent showModal={() => { }} />
@@ -131,7 +130,7 @@ console.log('mockuppppppppppp',mockup);
                             </Button>
                         </div>
                     </div>
-                    
+
                     {/* Rest of the component remains the same */}
                     <div id="carousel-container" className="bg-light p-3 rounded">
                         <Carousel activeIndex={activeIndex} onSelect={handleSelect} className="mb-3" interval={null}>
@@ -162,7 +161,7 @@ console.log('mockuppppppppppp',mockup);
                     <h5 className="mt-4">{mockup.domainname} | {mockup.subdomainname}</h5>
                     <p>Contrary to popular belief, Lorem Ipsum is not simply random text...</p>
                     <h5 className="mt-4">About Project</h5>
-                    <p> {mockup.description} </p>
+                    <p dangerouslySetInnerHTML={{__html: mockup.description}} />
                     <h5 className="mt-4">About Screen</h5>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
                 </Col>
@@ -204,6 +203,11 @@ console.log('mockuppppppppppp',mockup);
             )}
 
             {/* Edit Modal */}
+            {/* <UploadMockupModal
+                show={showEditModal}
+                handleClose={() => setShowEditModal(false)}
+                handleUpload={handleUpload}
+            /> */}
             <EditMockupModal
                 show={showEditModal}
                 handleClose={() => setShowEditModal(false)}

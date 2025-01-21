@@ -6,7 +6,9 @@ import DomainLayout from "../Components/DomainLayout";
 const BeforeAfter = (props) => {
   return (
     <div className="container-fluid px-0">
-      <DomainLayout tabName={props?.selectedTabName} />
+      <DomainLayout
+        tabName={props?.selectedTabName}
+      />
     </div>
   );
 };

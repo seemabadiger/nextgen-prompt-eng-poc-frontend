@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -5,23 +6,21 @@ import axios from "axios";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import generatePdf from "../utils/htmlToPdf";
+import SearchMockup from './SearchMockup'
+import MockupCard from './MockupCard'
+import OverlayLoader from "./OverlayLoader";
 
 import {
   Container,
-  Form,
   Button,
   Row,
   Col,
-  Card,
-  Badge,
-  Dropdown,
-  ListGroup,
-  Carousel,
-  Spinner,
+  Dropdown
 } from "react-bootstrap";
 
-const DomainLayout = ({ tabName, mockupList }) => {
+const DomainLayout = ({ tabName, mockupList, handleSortSelect, handleSearchSubmit }) => {
   const { user } = useContext(AuthContext);
+  const [loading, setLoading ] = useState(false)
   const [selectedMockups, setSelectedMockups] = useState([]);
   const [selectedMockupsForDownload, setSelectedMockupsForDownload] = useState(
     []
@@ -43,24 +42,6 @@ const DomainLayout = ({ tabName, mockupList }) => {
     }
   }, [mockupList]);
 
-  const fetchFavorites = async () => {
-    if (!user) return;
-
-    setIsLoadingFavorites(true);
-    try {
-      const response = await axios.get(
-        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`
-      );
-      const favoriteIds = response.data.map(
-        (favorite) => favorite.mockupGroupId
-      );
-      setFavorites(favoriteIds);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    } finally {
-      setIsLoadingFavorites(false);
-    }
-  };
 
   const sortMockups = (sort) => {
     let sortedMockups = [...mockups];
@@ -126,60 +107,27 @@ const DomainLayout = ({ tabName, mockupList }) => {
       const filteredMockups = mockupList.filter(
         (mockup) => mockup.domainname === domainName
       );
-      console.log("Filtered Mockups:", filteredMockups); // Debugging log
       setMockups(filteredMockups);
       setNoMockupsFound(filteredMockups.length === 0);
     }
   };
 
-  const handleSortSelect = (sort) => {
-    setSortOption(sort);
-    let apiUrl;
-    if (sort === "Alphabetically") {
-      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
-    } else {
-      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
-    }
+  // const handleSortSelect = (sort) => {
+  //   setSortOption(sort);
 
-    axios
-      .get(apiUrl)
-      .then((response) => {
-        console.log("API Response:", response.data); // Debugging log
-        const sortedMockups = response.data.map((mockup) => ({
-          id: mockup.id,
-          title: mockup.projectTitle,
-          description: mockup.projectDescription,
-          images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.tags.map((tag) => tag.name),
-          domainname: mockup.domain.name,
-          subdomainname: mockup.subdomain.name,
-          mockupType: mockup.mockupType,
-        }));
-        setMockups(sortedMockups);
-        setNoMockupsFound(sortedMockups.length === 0);
-      })
-      .catch((error) => {
-        console.error("Error fetching sorted mockups:", error);
-      });
-  };
+  // };
 
   const toggleFavorites = () => {
     setShowFavorites(!showFavorites);
   };
 
-  const handleCarouselClick = (e) => {
-    e.stopPropagation(); // Prevent navigation
-  };
-
-  const handleCardClick = (mockup) => {
-    navigate(`/mockup/${mockup.id}`, { state: { mockup } });
+  const handleCardClick = (mockup, index) => {
+    navigate(`/mockup/${mockup.id}`, { state: { mockup, index } });
   };
 
   const displayedMockups = showFavorites
     ? mockups.filter((mockup) => favorites.includes(mockup.id))
     : mockups;
-
-  console.log("Displayed Mockups:", displayedMockups); // Debugging log
 
   const handleCheckboxChange = (e, mockupId) => {
     e.stopPropagation(); // Stop event propagation to prevent card click
@@ -199,141 +147,111 @@ const DomainLayout = ({ tabName, mockupList }) => {
   };
 
   const handleMockupData = () => {
-    const selectedMockups = displayedMockups?.filter(
+    const selectedMockupsData = displayedMockups?.filter(
       (res) => res?.mockupType?.name === tabName
     );
-    console.log("Selected Mockups for Rendering:", selectedMockups); // Debugging log
-    return (selectedMockups || []).map((mockup) => (
+    return (selectedMockupsData || []).map((mockup) => (
       <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
-        <Card className="template-card" onClick={() => handleCardClick(mockup)}>
-          <div className="checkbox-container d-flex align-items-center">
-            {user?.role === "User" && (
-              <FavoriteIcon
-                className="me-2"
-                style={{
-                  cursor: "pointer",
-                  color: favorites.includes(mockup.id) ? "red" : "grey",
-                  fontSize: "1.25rem", // Adjust this value to match the checkbox size
-                }}
-                onClick={(e) => handleFavorite(e, mockup.id)}
-              />
-            )}
-            <Form.Check
-              type="checkbox"
-              checked={selectedMockups.includes(mockup.id)}
-              onChange={(e) => handleCheckboxChange(e, mockup.id)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-          <Carousel interval={null} onClick={handleCarouselClick}>
-            {mockup.images.map((image, index) => (
-              <Carousel.Item key={index}>
-                <img
-                  className="d-block w-100 cardImg"
-                  src={image}
-                  alt={`Slide ${index}`}
-                />
-              </Carousel.Item>
-            ))}
-          </Carousel>
-          <Card.Body>
-            <Card.Title>
-              {mockup.domainname}| {mockup.subdomainname}
-            </Card.Title>
-            <Card.Text>{mockup.title}</Card.Text>
-            <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
-              {mockup.tags.map((tag) => (
-                <ListGroup.Item key={tag} className="border-0 p-0 me-2">
-                  <Badge bg="secondary">{tag}</Badge>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </Card.Body>
-        </Card>
+        <MockupCard
+          handleCardClick={handleCardClick}
+          mockup={mockup}
+          user={user}
+          selectedMockups={selectedMockups}
+          favorites={favorites}
+          handleFavorite={handleFavorite}
+          handleCheckboxChange={handleCheckboxChange}
+        />
       </Col>
     ));
   };
 
   return (
-    <Container className="p-0">
-      <div className="d-flex justify-content-between align-items-center mb-4 mt-3 inner-tabs">
-        <div className="d-flex flex-wrap">
-          {[
-            "All",
-            "Mobile",
-            "Moodle",
-            "WordPress",
-            "Analytics",
-            "HRTech",
-            "EdTech",
-            "HealthTech",
-          ].map((domain) => (
-            <Button
-              style={{
-                marginBottom: "10px",
-              }}
-              key={domain}
-              variant="outline-secondary"
-              className={`me-2 ${activeButton === domain ? "active-button" : ""
-                }`}
-              onClick={() => handleDomainFilter(domain)}
-            >
-              {domain}
-            </Button>
-          ))}
-        </div>
-        <div className="d-flex align-items-center">
-          {user?.role === "User" && (
-            <Button
-              variant={showFavorites ? "secondary" : "outline-secondary"}
-              className="me-2 d-flex align-items-center"
-              onClick={toggleFavorites}
-              disabled={isLoadingFavorites}
-            >
-              <FavoriteIcon fontSize="small" className="me-2" />
-              {isLoadingFavorites ? "Loading..." : "My Favorites"}
-            </Button>
+    <>
+      <SearchMockup setMockups={setMockups} handleSearchSubmit={handleSearchSubmit}/>
+      <div className="container-fluid px-0">
+        <Container className="p-0">
+          <div className="d-flex justify-content-between align-items-center mb-4 mt-3 inner-tabs">
+            <div className="d-flex flex-wrap">
+              {[
+                "All",
+                "Mobile",
+                "Moodle",
+                "WordPress",
+                "Analytics",
+                "HRTech",
+                "EdTech",
+                "HealthTech",
+              ].map((domain) => (
+                <Button
+                  style={{
+                    marginBottom: "10px",
+                  }}
+                  key={domain}
+                  variant="outline-secondary"
+                  className={`me-2 ${activeButton === domain ? "active-button" : ""
+                    }`}
+                  onClick={() => handleDomainFilter(domain)}
+                >
+                  {domain}
+                </Button>
+              ))}
+            </div>
+            <div className="d-flex align-items-center">
+              {user?.role === "User" && (
+                <Button
+                  variant={showFavorites ? "secondary" : "outline-secondary"}
+                  className="me-2 d-flex align-items-center"
+                  onClick={toggleFavorites}
+                  disabled={isLoadingFavorites}
+                >
+                  <FavoriteIcon fontSize="small" className="me-2" />
+                  {isLoadingFavorites ? "Loading..." : "My Favorites"}
+                </Button>
+              )}
+
+              {user?.role === "Admin" && (
+                <Button
+                  variant="outline-secondary"
+                  className="me-2 d-flex align-items-center"
+                  onClick={() => generatePdf(selectedMockupsForDownload, setLoading)}
+                >
+                  <GetAppIcon fontSize="small" className="me-2" />
+                  Create PDF
+                </Button>
+              )}
+              <Dropdown>
+                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
+                  Sort By {sortOption}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => handleSortSelect("Alphabetically")}>
+                    Alphabetically
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={() => handleSortSelect("Recent")}>
+                    Recent
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
+          {noMockupsFound ? (
+            <p>No mockups found for the entered keyword.</p>
+          ) : (
+            <Row className="mt-4">{handleMockupData()}</Row>
           )}
 
-          {user?.role === "Admin" && (
-            <Button
-              variant="outline-secondary"
-              className="me-2 d-flex align-items-center"
-              onClick={() => generatePdf(selectedMockupsForDownload)}
-            >
-              <GetAppIcon fontSize="small" className="me-2" />
-              Create PDF
-            </Button>
-          )}
-          <Dropdown>
-            <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-              Sort By {sortOption}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => handleSortSelect("Alphabetically")}>
-                Alphabetically
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleSortSelect("Recent")}>
-                Recent
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+    {/* !displayedMockups?.length ? (
+            <div className="text-center">
+              <Spinner animation="border" role="status" variant="primary">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+              <p>Loading...</p>
+            </div>
+          ) */}
+        </Container>
       </div>
-      {noMockupsFound ? (
-        <p>No mockups found for the entered keyword.</p>
-      ) : !displayedMockups?.length ? (
-        //Added loader using AI
-        <div className="text-center">
-          <Spinner animation="border" role="status" variant="primary">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-          <p>Loading...</p>
-        </div>
-      ) : (
-        <Row className="mt-4">{handleMockupData()}</Row>
-      )}
-    </Container>
+      <OverlayLoader show={loading} />
+    </>
   );
 };
 

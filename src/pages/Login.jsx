@@ -95,7 +95,6 @@ const Login = () => {
     }, [generalError]);
 
     if (user && isLoggedIn) {
-        console.log("login page USER->>>>>", user);
         if (user.role === "ADMIN") {
             return <Navigate to="/admin" />;
         } else {

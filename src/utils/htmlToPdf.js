@@ -18,19 +18,19 @@ const preloadImage = (images) => {
       });
 }; 
 
-const generatePdf = async (mockups) => {
+const generatePdf = async (mockups, setLoading) => {
     if (mockups.length) {
+        setLoading(true)
         const images = await Promise.all(mockups.flatMap(mockup => mockup.images.map(i => preloadImage(i))));
-        
         const htmlString = mockups.map((mockup, index) => {
         const addPageBreakClass = index > 0 ? 'class="addPageBreak"' : '';
         const string = `
         <!-- Header Section -->
         <div ${addPageBreakClass} style="color: #6c63ff; font-weight: bold; font-size: 1.5em;">
-            ${mockup?.domainname} 
+            ${mockup?.domainname}
             <span style="font-size: 1em; color: #333; font-weight: normal;">| ${mockup?.subdomainname}</span>
         </div>
-        
+
         <!-- Title and Tags in Same Line -->
         <div style="display: flex; align-items: center; margin-top: 10px;">
             <h1 style="font-weight: bold; font-size: 1.8em; color: #333; margin: 0 10 0 0;">${mockup.title}</h1>
@@ -38,12 +38,12 @@ const generatePdf = async (mockups) => {
              ${mockup.tags.map(tag => `<div style="background-color: #f0f0f0; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 0.9em;">${tag}</div>`).join('')}
             </div>
         </div>
-        
+
         <!-- Description Paragraph -->
         <p style="margin-top: 10px; color: #666; line-height: 1.6;">
              ${mockup.description}
         </p>
-        
+
         <!-- Image Section (full-width with padding) -->
         <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 20px;">
          ${
@@ -62,7 +62,7 @@ const generatePdf = async (mockups) => {
             image: { type: "png", quality: 0.98 },
             html2canvas: { scale: 2},
             jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
-            pagebreak:    { 
+            pagebreak:    {
                 before: '.addPageBreak',
                 avoid: ['img'], // Avoid breaking images across pages
               }
@@ -71,6 +71,7 @@ const generatePdf = async (mockups) => {
         const element = document.createElement("div");
         element.innerHTML = htmlString;
         html2pdf().set(pdfOptions).from(element).save();
+        setLoading(false);
     }
 };
 

@@ -1,47 +1,26 @@
+/* eslint-disable react/prop-types */
 import { useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from '../Context/AuthContext';
 import { Form } from "react-bootstrap";
 
-const SearchMockup = ({ setMockups }) => {
+const SearchMockup = ({ handleSearchSubmit }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [noMockupsFound, setNoMockupsFound] = useState(false);
   const [emptySearchQuery, setEmptySearchQuery] = useState(false);
-  const { user } = useContext(AuthContext);
 
-  const handleSearchSubmit = (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     if (!searchQuery) {
       setEmptySearchQuery(true);
       setNoMockupsFound(false);
-      setMockups([]);
       setTimeout(() => {
         setEmptySearchQuery(false);
       }, 1000);
       return;
     }
     setEmptySearchQuery(false);
-    const url = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
-    axios
-      .get(url)
-      .then((response) => {
-        const searchResults = response.data.map((mockup) => ({
-          id: mockup.id,
-          title: mockup.projectTitle,
-          description: mockup.projectDescription,
-          images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.tags.map((tag) => tag.name),
-          domainname: mockup.domain.name,
-          subdomainname: mockup.subdomain.name,
-          mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" }
-        }));
-        setMockups(searchResults);
-        setNoMockupsFound(searchResults.length === 0);
-      })
-      .catch((error) => {
-        console.error("Error fetching search results:", error);
-        setNoMockupsFound(true);
-      });
+    handleSearchSubmit(searchQuery)
   };
 
   const handleSearchChange = (e) => {
@@ -67,7 +46,7 @@ const SearchMockup = ({ setMockups }) => {
         paddingBottom: "8px",
       }}
     >
-      <Form onSubmit={handleSearchSubmit}>
+      <Form onSubmit={handleSearch}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <div className="w-100 ps-3 pt-2">
             <label

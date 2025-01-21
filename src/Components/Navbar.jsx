@@ -1,5 +1,6 @@
-import { useState, useContext } from "react";
-import { Navbar, Nav, NavDropdown, Tab } from "react-bootstrap";
+/* eslint-disable react/prop-types */
+import { useContext } from "react";
+import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import HeaderBackground from "../assets/header-bg.png";
 import { AuthContext } from "../Context/AuthContext";
 import Logo from "../assets/logo.svg";
@@ -7,25 +8,21 @@ import HarbingerLogo from "../assets/harbinger_logo.svg";
 import UploadLogo from "../assets/upload_logo.svg";
 import Avatar from "../assets/avatar.png";
 import { Navigate } from "react-router-dom";
-import CaseStudies from "../pages/CaseStudies";
 import ProcessDiagram from "../pages/ProcessDiagram";
-import BeforeAfter from "../pages/BeforeAfter";
-import SearchMockup from "./SearchMockup";
-import VisualSample from "../pages/VisualSample";
+import DomainLayout from './DomainLayout'
 
 const NavbarComponent = ({
   mockups,
-  setMockups,
   showModal,
   selectedTabValue,
-  selectedTabName,
+  selectedTab,
+  handleSortSelect,
+  handleTabSelection,
+  handleSearchSubmit
 }) => {
   const { user, logout } = useContext(AuthContext);
-  const [selectedTab, setSelectedTab] = useState("visual-samples");
-  const [key, setKey] = useState("visualSample");
-
   const handleTabClick = (tab) => {
-    setSelectedTab(tab);
+    handleTabSelection(tab);
   };
 
   const handleLogout = async () => {
@@ -35,7 +32,7 @@ const NavbarComponent = ({
 
   const handleUploadClick = () => {
     showModal(!0);
-    selectedTabValue(key);
+    selectedTabValue(selectedTab);
   };
 
   return (
@@ -157,11 +154,6 @@ const NavbarComponent = ({
           className="container"
           style={{ display: "flex", flexDirection: "column", width: "100%" }}
         >
-          <Tab.Container
-            id="tabs-example"
-            activeKey={key}
-            onSelect={(k) => setKey(k)}
-          >
             <Nav
               variant="pills"
               className="ml-auto main-nav-tab"
@@ -173,21 +165,19 @@ const NavbarComponent = ({
             >
               <Nav.Item>
                 <Nav.Link
-                  // href="#visual-samples"
-                  eventKey={"visualSample"}
                   style={{
                     ...tabStyle,
-                    color: selectedTab === "visual-samples" ? "#000" : "#fff",
+                    color: selectedTab === "Visual Samples" ? "#000" : "#fff",
                     background:
-                      selectedTab === "visual-samples" ? "#fff" : "transparent",
+                      selectedTab === "Visual Samples" ? "#fff" : "transparent",
                     fontWeight:
-                      selectedTab === "visual-samples" ? 500 : "normal",
+                      selectedTab === "Visual Samples" ? 500 : "normal",
                     borderTopLeftRadius: "5px",
                     borderTopRightRadius: "5px",
                     borderBottomLeftRadius: "0px",
                     borderBottomRightRadius: "0px",
                   }}
-                  onClick={() => handleTabClick("visual-samples")}
+                  onClick={() => handleTabClick("Visual Samples")}
                 >
                   <span
                     style={{
@@ -204,20 +194,18 @@ const NavbarComponent = ({
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link
-                  // href="#case-studies"
-                  eventKey={"caseStudies"}
                   style={{
                     ...tabStyle,
-                    color: selectedTab === "case-studies" ? "#000" : "#fff",
+                    color: selectedTab === "Case Studies" ? "#000" : "#fff",
                     background:
-                      selectedTab === "case-studies" ? "#fff" : "transparent",
-                    fontWeight: selectedTab === "case-studies" ? 500 : "normal",
+                      selectedTab === "Case Studies" ? "#fff" : "transparent",
+                    fontWeight: selectedTab === "Case Studies" ? 500 : "normal",
                     borderTopLeftRadius: "5px",
                     borderTopRightRadius: "5px",
                     borderBottomLeftRadius: "0px",
                     borderBottomRightRadius: "0px",
                   }}
-                  onClick={() => handleTabClick("case-studies")}
+                  onClick={() => handleTabClick("Case Studies")}
                 >
                   <span
                     style={{
@@ -232,21 +220,19 @@ const NavbarComponent = ({
               </Nav.Item>
 
               <Nav.Link
-                // href="#process-diagram"
-                eventKey={"processDiagram"}
                 style={{
                   ...tabStyle,
-                  color: selectedTab === "process-diagram" ? "#000" : "#fff",
+                  color: selectedTab === "Process Diagram & Artifacts" ? "#000" : "#fff",
                   background:
-                    selectedTab === "process-diagram" ? "#fff" : "transparent",
+                    selectedTab === "Process Diagram & Artifacts" ? "#fff" : "transparent",
                   fontWeight:
-                    selectedTab === "process-diagram" ? 500 : "normal",
+                    selectedTab === "Process Diagram & Artifacts" ? 500 : "normal",
                   borderTopLeftRadius: "5px",
                   borderTopRightRadius: "5px",
                   borderBottomLeftRadius: "0px",
                   borderBottomRightRadius: "0px",
                 }}
-                onClick={() => handleTabClick("process-diagram")}
+                onClick={() => handleTabClick("Process Diagram & Artifacts")}
               >
                 <span
                   style={{
@@ -260,20 +246,18 @@ const NavbarComponent = ({
               </Nav.Link>
               <Nav.Item>
                 <Nav.Link
-                  // href="#before-after"
-                  eventKey={"beforeAfter"}
                   style={{
                     ...tabStyle,
-                    color: selectedTab === "before-after" ? "#000" : "#fff",
+                    color: selectedTab === "Before After" ? "#000" : "#fff",
                     background:
-                      selectedTab === "before-after" ? "#fff" : "transparent",
-                    fontWeight: selectedTab === "before-after" ? 500 : "normal",
+                      selectedTab === "Before After" ? "#fff" : "transparent",
+                    fontWeight: selectedTab === "Before After" ? 500 : "normal",
                     borderTopLeftRadius: "5px",
                     borderTopRightRadius: "5px",
                     borderBottomLeftRadius: "0px",
                     borderBottomRightRadius: "0px",
                   }}
-                  onClick={() => handleTabClick("before-after")}
+                  onClick={() => handleTabClick("Before After")}
                 >
                   <span
                     style={{
@@ -287,25 +271,17 @@ const NavbarComponent = ({
                 </Nav.Link>
               </Nav.Item>
             </Nav>
-
-            <Tab.Content>
-              <Tab.Pane eventKey="visualSample">
-                <SearchMockup setMockups={setMockups} />
-                <VisualSample mockups={mockups} selectedTabName={selectedTabName} />
-              </Tab.Pane>
-              <Tab.Pane eventKey="caseStudies">
-                <SearchMockup setMockups={setMockups} />
-                <CaseStudies selectedTabName={selectedTabName} />
-              </Tab.Pane>
-              <Tab.Pane eventKey="processDiagram">
-                <ProcessDiagram />
-              </Tab.Pane>
-              <Tab.Pane eventKey="beforeAfter">
-                <SearchMockup setMockups={setMockups} />
-                <BeforeAfter selectedTabName={selectedTabName} />
-              </Tab.Pane>
-            </Tab.Content>
-          </Tab.Container>
+            {['Visual Samples', 'Case Studies', 'Before After'].includes(selectedTab) && (
+              <DomainLayout
+                tabName={selectedTab}
+                mockupList={mockups.filter(mock => mock?.mockupType?.name === selectedTab)}
+                handleSortSelect={handleSortSelect}
+                handleSearchSubmit={handleSearchSubmit}
+              />
+            )}
+            {selectedTab === 'Process Diagram & Artifacts' && (
+              <ProcessDiagram />
+            )}
         </div>
       </Navbar.Collapse>
     </Navbar>

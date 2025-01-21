@@ -6,7 +6,10 @@ import DomainLayout from "../Components/DomainLayout";
 const CaseStudies = (props) => {
   return (
     <div className="container-fluid px-0">
-      <DomainLayout tabName={props?.selectedTabName} />
+      <DomainLayout
+        tabName={'Case Studies'}
+        mockupList={props?.mockups}
+      />
     </div>
   );
 };

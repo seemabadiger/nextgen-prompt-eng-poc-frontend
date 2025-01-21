@@ -1,39 +1,19 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  Container,
-  Navbar,
-  Nav,
-  Form,
-  Button,
-  Row,
-  Col,
-  Card,
-  Badge,
-  DropdownButton,
-  Dropdown,
-  Modal,
-  ListGroup,
-  Carousel,
-} from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
 import axios from "axios";
 import "./Dashboard.css";
 import UploadMockupModal from "./UploadMockupModal";
 import NavbarComponent from "./Navbar";
 import { AuthContext } from "../Context/AuthContext";
-import ProcessUploadModal from "./ProcessDiagramUploadModal";
-import BeforeAfterUpload from "./BeforeAfterUpload";
-import CaseStudyUpload from "./CaseStudyUpload";
+import OverlayLoader from './OverlayLoader'
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("visualSample");
-  const [tabName, setTabName] = useState("Visual Samples");
+  const [selectedTab, setSelectedTab] = useState("Visual Samples");
   const [mockups, setMockups] = useState([]);
   const [sortOption, setSortOption] = useState("");
-  const [updateModalShow, setUpdateModalShow] = useState(false);
-  const [selectedMockup, setSelectedMockup] = useState(null);
   const [updateForm, setUpdateForm] = useState({
     Name: "",
     Tags: [],
@@ -56,15 +36,9 @@ const DashboardLayout = () => {
   useEffect(() => {
     if (user) {
       fetchMockups(user.id);
-      fetchFavorites();
+      // fetchFavorites();
     }
   }, [user]);
-
-  useEffect(() => {
-    if (selectedTab) {
-      handleTab(selectedTab);
-    }
-  }, [selectedTab]);
 
   // Sort mockups based on selected option
   useEffect(() => {
@@ -74,6 +48,7 @@ const DashboardLayout = () => {
   }, [sortOption]);
 
   const fetchMockups = (userId) => {
+    setLoading(true);
     axios
       .get(
         `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${userId}/mockups`
@@ -88,12 +63,17 @@ const DashboardLayout = () => {
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
           mockupType: mockup.mockupType,
+          mockupsData: mockup.mockups.map((m) => ({
+            image: m.filePath,
+            tags: m?.tags.split(','),
+          })),
         }));
-        
         setMockups(fetchedMockups);
         setNoMockupsFound(fetchedMockups.length === 0);
+        setLoading(false);
       })
       .catch((error) => {
+        setLoading(false);
         console.error("Error fetching mockups:", error);
       });
   };
@@ -117,39 +97,88 @@ const DashboardLayout = () => {
     setSelectedTab(val);
   };
 
-  const handleUpload = (newMockups) => {
+  const handleUpload = () => {
     fetchMockups(user.id);
-
-    // setMockups((prev) => [...prev, ...newMockups]);
   };
 
-  // const handleSortSelect = (sort) => {
-  //   setSortOption(sort);
-  //   let apiUrl;
-  //   if (sort === 'Alphabetically') {
-  //     apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
-  //   } else {
-  //     apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
-  //   }
+  const handleSearchSubmit = (searchQuery) => {
+    setMockups([]);
+    setLoading(true)
+    const url = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/search?userId=${user?.id}&query=${searchQuery}`;
+    axios
+      .get(url)
+      .then((response) => {
+        const searchResults = response.data.map((mockup) => ({
+          id: mockup.id,
+          title: mockup.projectTitle,
+          description: mockup.projectDescription,
+          images: mockup.mockups.map((m) => m.filePath),
+          tags: mockup.tags.map((tag) => tag.name),
+          domainname: mockup.domain.name,
+          subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" }
+        }));
+        setMockups(searchResults);
+        setNoMockupsFound(searchResults.length === 0);
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error fetching search results:", error);
+        setNoMockupsFound(true);
+        setLoading(false)
+      });
+  };
 
-  //   axios.get(apiUrl)
-  //     .then(response => {
-  //       const sortedMockups = response.data.map(mockup => ({
-  //         id: mockup.id,
-  //         title: mockup.projectTitle,
-  //         description: mockup.projectDescription,
-  //         images: mockup.mockups.map(m => m.filePath),
-  //         tags: mockup.tags.map(tag => tag.name),
-  //         domainname: mockup.domain.name,
-  //         subdomainname: mockup.subdomain.name
-  //       }));
-  //       setMockups(sortedMockups);
-  //       setNoMockupsFound(sortedMockups.length === 0);
-  //     })
-  //     .catch(error => {
-  //       console.error('Error fetching sorted mockups:', error);
-  //     });
-  // };
+  const handleSortSelect = (sort) => {
+    setLoading(true)
+    let apiUrl;
+    if (sort === "Alphabetically") {
+      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/alphabetical?userId=${user.id}`;
+    } else {
+      apiUrl = `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/recent?userId=${user.id}`;
+    }
+    setMockups([]);
+    axios
+      .get(apiUrl)
+      .then((response) => {
+        console.log("API Response:", response.data); // Debugging log
+        const sortedMockups = response.data.map((mockup) => ({
+          id: mockup.id,
+          title: mockup.projectTitle,
+          description: mockup.projectDescription,
+          images: mockup.mockups.map((m) => m.filePath),
+          tags: mockup.tags.map((tag) => tag.name),
+          domainname: mockup.domain.name,
+          subdomainname: mockup.subdomain.name,
+          mockupType: mockup.mockupType,
+        }));
+        setMockups(sortedMockups);
+        setNoMockupsFound(sortedMockups.length === 0);
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error fetching sorted mockups:", error);
+        setLoading(false)
+      });
+  };
+  const fetchFavorites = async () => {
+    if (!user) return;
+    setMockups([]);
+    setIsLoadingFavorites(true);
+    try {
+      const response = await axios.get(
+        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/likes`
+      );
+      const favoriteIds = response.data.map(
+        (favorite) => favorite.mockupGroupId
+      );
+      setFavorites(favoriteIds);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    } finally {
+      setIsLoadingFavorites(false);
+    }
+  };
 
   // const handleDomainFilter = (domainName) => {
   //   setActiveButton(domainName);
@@ -277,25 +306,6 @@ const DashboardLayout = () => {
   //   navigate(`/mockup/${mockup.id}`, { state: { mockup } });
   // };
 
-  const fetchFavorites = async () => {
-    if (!user) return;
-
-    setIsLoadingFavorites(true);
-    try {
-      const response = await axios.get(
-        `https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/${user.id}/mockups`
-      );
-      const favoriteIds = response.data.map(
-        (favorite) => favorite.mockupGroupId
-      );
-      setFavorites(favoriteIds);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    } finally {
-      setIsLoadingFavorites(false);
-    }
-  };
-
   // const handleFavorite = async (e, mockupId) => {
   //   e.preventDefault();
   //   e.stopPropagation();
@@ -321,72 +331,26 @@ const DashboardLayout = () => {
   //   }
   // };
 
-  const renderUpload = () => {
-    if (selectedTab === "visualSample") {
-      return (
-        <UploadMockupModal
-          show={show}
-          handleClose={handleClose}
-          onUpload={handleUpload}
-        />
-      );
-    } else if (selectedTab === "caseStudies") {
-      return (
-        <CaseStudyUpload
-          show={show}
-          handleClose={handleClose}
-          handleUpload={handleUpload}
-        />
-      );
-    } else if (selectedTab === "processDiagram") {
-      return (
-        <ProcessUploadModal
-          show={show}
-          handleClose={handleClose}
-          handleUpload={handleUpload}
-        />
-      );
-    } else if (selectedTab === "beforeAfter") {
-      return (
-        <BeforeAfterUpload
-          show={show}
-          handleClose={handleClose}
-          handleUpload={handleUpload}
-        />
-      );
-    } else {
-      return (
-        <UploadMockupModal
-          show={show}
-          handleClose={handleClose}
-          handleUpload={handleUpload}
-        />
-      );
-    }
-  };
-  const handleTab = (val) => {
-    if (val === "visualSample") {
-      return "Visual Samples";
-    } else if (val === "caseStudies") {
-      return "Case Studies";
-    } else if (val === "beforeAfter") {
-      return "Before After";
-    }
-  };
-
   return (
     <div>
       <NavbarComponent
         mockups={mockups}
         setMockups={setMockups}
         showModal={handleShow}
-        selectedTabValue={handleTabSelection}
-        selectedTabName={tabName}
-
+        handleTabSelection={handleTabSelection}
+        selectedTab={selectedTab}
+        handleSortSelect={handleSortSelect}
+        handleSearchSubmit={handleSearchSubmit}
       />
-      {renderUpload()}
-      {/* <UploadMockupModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}
-      {/* <ProcessUploadModal show={show} handleClose={handleClose} handleUpload={handleUpload} /> */}
+      {show && (
+        <UploadMockupModal
+          show={show}
+          handleClose={handleClose}
+          onUpload={handleUpload}
+          selectedTab={selectedTab}
+        />
+      )}
+      <OverlayLoader show={loading} />
     </div>
   );
 };
