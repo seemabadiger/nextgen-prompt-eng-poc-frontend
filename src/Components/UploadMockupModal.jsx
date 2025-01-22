@@ -290,13 +290,14 @@ const UploadMockupModal = ({ show, handleClose, onUpload, selectedTab }) => {
                       style={{ height: '50px' }}
                     >
                       <option value="">Select Domain</option>
-                      <option value="Mobile">Mobile</option>
-                      <option value="Moodle">Moodle</option>
-                      <option value="WordPress">WordPress</option>
-                      <option value="Analytics">Analytics</option>
-                      <option value="HRTech">HRTech</option>
-                      <option value="EdTech">EdTech</option>
-                      <option value="HealthTech">HealthTech</option>
+                      {/* <option value="Mobile">Mobile</option> */}
+                      {/* <option value="Moodle">Moodle</option> */}
+                      {/* <option value="WordPress">WordPress</option> */}
+                      {/* <option value="Analytics">Analytics</option> */}
+                      <option value="HRTech">HR Tech</option>
+                      <option value="EdTech">ED Tech</option>
+                      <option value="HealthTech">Health Tech</option>
+                      <option value="HealthTech">Others</option>
                     </Form.Control>
                     {errors.domain && touched.domain ? (
                     <div className='error'>{errors.domain}</div>

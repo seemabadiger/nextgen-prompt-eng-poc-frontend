@@ -14,7 +14,7 @@ import DomainLayout from './DomainLayout'
 const NavbarComponent = ({
   mockups,
   showModal,
-  selectedTabValue,
+  // selectedTabValue,
   selectedTab,
   handleSortSelect,
   handleTabSelection,
@@ -32,7 +32,7 @@ const NavbarComponent = ({
 
   const handleUploadClick = () => {
     showModal(!0);
-    selectedTabValue(selectedTab);
+    // selectedTabValue(selectedTab);
   };
 
   return (

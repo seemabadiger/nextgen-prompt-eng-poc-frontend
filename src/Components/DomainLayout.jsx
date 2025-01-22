@@ -104,8 +104,8 @@ const DomainLayout = ({ tabName, mockupList, handleSortSelect, handleSearchSubmi
       setMockups(mockupList);
       setNoMockupsFound(mockupList.length === 0);
     } else {
-      const filteredMockups = mockupList.filter(
-        (mockup) => mockup.domainname === domainName
+      const filteredMockups = (mockupList || []).filter(
+        (mockup) => (mockup.tags || []).includes(domainName)
       );
       setMockups(filteredMockups);
       setNoMockupsFound(filteredMockups.length === 0);
