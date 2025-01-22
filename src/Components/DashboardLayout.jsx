@@ -108,15 +108,29 @@ const DashboardLayout = () => {
     axios
       .get(url)
       .then((response) => {
+        // const searchResults = response.data.map((mockup) => ({
+        //   id: mockup.id,
+        //   title: mockup.projectTitle,
+        //   description: mockup.projectDescription,
+        //   images: mockup.mockups.map((m) => m.filePath),
+        //   tags: mockup.tags.map((tag) => tag.name),
+        //   domainname: mockup.domain.name,
+        //   subdomainname: mockup.subdomain.name,
+        //   mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" }
+        // }));
         const searchResults = response.data.map((mockup) => ({
           id: mockup.id,
           title: mockup.projectTitle,
           description: mockup.projectDescription,
           images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.tags.map((tag) => tag.name),
+          tags: mockup.mockups.flatMap((m) => m.tags.split(',')),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
-          mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" }
+          mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" },
+          mockupsData: mockup.mockups.map((m) => ({
+            image: m.filePath,
+            tags: m?.tags.split(','),
+          })),
         }));
         setMockups(searchResults);
         setNoMockupsFound(searchResults.length === 0);
@@ -142,15 +156,29 @@ const DashboardLayout = () => {
       .get(apiUrl)
       .then((response) => {
         console.log("API Response:", response.data); // Debugging log
+        // const sortedMockups = response.data.map((mockup) => ({
+        //   id: mockup.id,
+        //   title: mockup.projectTitle,
+        //   description: mockup.projectDescription,
+        //   images: mockup.mockups.map((m) => m.filePath),
+        //   tags: mockup.tags.map((tag) => tag.name),
+        //   domainname: mockup.domain.name,
+        //   subdomainname: mockup.subdomain.name,
+        //   mockupType: mockup.mockupType,
+        // }));
         const sortedMockups = response.data.map((mockup) => ({
           id: mockup.id,
           title: mockup.projectTitle,
           description: mockup.projectDescription,
           images: mockup.mockups.map((m) => m.filePath),
-          tags: mockup.tags.map((tag) => tag.name),
+          tags: mockup.mockups.flatMap((m) => m.tags.split(',')),
           domainname: mockup.domain.name,
           subdomainname: mockup.subdomain.name,
-          mockupType: mockup.mockupType,
+          mockupType: mockup.mockupType || { "id": 2, "name": "Visual Samples" },
+          mockupsData: mockup.mockups.map((m) => ({
+            image: m.filePath,
+            tags: m?.tags.split(','),
+          })),
         }));
         setMockups(sortedMockups);
         setNoMockupsFound(sortedMockups.length === 0);

@@ -18,6 +18,7 @@ const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites,
         e.stopPropagation(); // Prevent navigation
     };
     // const selectedMockupsIds = selectedMockups.map((sid => sid.id))
+
     return (
         <Card className="template-card" onClick={() => handleCardClick(mockup, index)}>
             <div className="checkbox-container d-flex align-items-center">
@@ -40,7 +41,7 @@ const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites,
             />
             </div>
             <Carousel interval={null}  activeIndex={index} onSelect={handleSelect} onClick={handleCarouselClick}>
-            {mockup.mockupsData.map((mocked, index) => (
+            {(mockup.mockupsData || []).map((mocked, index) => (
                 <Carousel.Item key={index}>
                 <img
                     className="d-block w-100 cardImg"
@@ -56,8 +57,8 @@ const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites,
             </Card.Title>
             <Card.Text>{mockup.title}</Card.Text>
             <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
-                {mockup.mockupsData[index].tags.map((tag) => (
-                <ListGroup.Item key={tag} className="border-0 p-0 me-2">
+                {mockup.mockupsData && mockup.mockupsData[index].tags.map((tag) => (
+                <ListGroup.Item key={tag} className="border-0 p-0 me-2 mt-1">
                     <Badge bg="secondary">{tag}</Badge>
                 </ListGroup.Item>
                 ))}
