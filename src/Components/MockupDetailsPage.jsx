@@ -7,7 +7,7 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from 'axios';
-import EditMockupModal from './EditMockupModal'; // Import the EditMockupModal component
+import UploadMockupModal from './UploadMockupModal';
 
 const MockupDetailsPage = () => {
     const { state } = useLocation();
@@ -208,13 +208,16 @@ const MockupDetailsPage = () => {
                 handleClose={() => setShowEditModal(false)}
                 handleUpload={handleUpload}
             /> */}
-            <EditMockupModal
-                show={showEditModal}
-                handleClose={() => setShowEditModal(false)}
-                onUpdate={handleUpdate}
-                mockup={mockup} // Pass the mockup data to the EditMockupModal
-                mockupId={id}
-            />
+            {showEditModal && (
+                <UploadMockupModal
+                    show={showEditModal}
+                    handleClose={() => setShowEditModal(false)}
+                    onUpdate={handleUpdate}
+                    mockup={mockup} 
+                    mockupId={id}
+                />
+            )}
+
         </Container>
     );
 };

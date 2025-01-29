@@ -47,6 +47,36 @@ const DashboardLayout = () => {
     }
   }, [sortOption]);
 
+  const getModuleWiseData = (mockup) => {
+    const data = {
+      images: [],
+      tags:[],
+      beforeAfterData: [
+        {
+          tags: []
+        }, {
+          tags: []
+        }
+      ]
+    };
+    if (mockup.mockupType.name === "Visual Samples" ) {
+      data.images = mockup.mockups.map((m) => m.filePath);
+      // data.images = mockup.mockups.map((m) => ({
+      //   image: m.filePath,
+      //   tags: m?.tags.split(','),
+      // }));
+    } else if (mockup.mockupType.name === "Case Studies" ) {
+      data.images[0] = mockup?.caseStudy?.thumbnailImagePath;
+      data.tags = mockup?.caseStudy?.tags?.split(',');
+    } else if (mockup.mockupType.name === "Before After" ) {
+      data.images[0] = mockup?.beforeAfter?.beforeDesignFilePath;
+      data.images[1] = mockup?.beforeAfter?.afterDesignFilePath;
+      data.beforeAfterData[0].tags = mockup?.beforeAfter?.beforeTags?.split(',');
+      data.beforeAfterData[1].tags = mockup?.beforeAfter?.afterTags?.split(',');
+    }
+    return data;
+  }
+
   const fetchMockups = (userId) => {
     setLoading(true);
     axios
@@ -55,6 +85,7 @@ const DashboardLayout = () => {
       )
       .then((response) => {
         const fetchedMockups = response.data.map((mockup) => ({
+          ...mockup,
           id: mockup.id,
           title: mockup.projectTitle,
           description: mockup.projectDescription,
@@ -67,7 +98,14 @@ const DashboardLayout = () => {
             image: m.filePath,
             tags: m?.tags.split(','),
           })),
+          caseStudy: {
+            ...mockup.caseStudy,
+            image: mockup.caseStudy?.thumbnailImagePath,
+            tags: mockup.caseStudy?.tags?.split(','),
+          },
+          ...getModuleWiseData(mockup)
         }));
+        console.log('fetchedMockups', fetchedMockups)
         setMockups(fetchedMockups);
         setNoMockupsFound(fetchedMockups.length === 0);
         setLoading(false);

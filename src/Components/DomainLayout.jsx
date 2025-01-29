@@ -104,8 +104,9 @@ const DomainLayout = ({ tabName, mockupList, handleSortSelect, handleSearchSubmi
       setMockups(mockupList);
       setNoMockupsFound(mockupList.length === 0);
     } else {
+      console.log('mockupList', domainName, mockupList)
       const filteredMockups = (mockupList || []).filter(
-        (mockup) => (mockup.tags || []).includes(domainName)
+        (mockup) => (mockup.tags || []).includes(domainName) || (mockup.projectTitle.toLowerCase()).includes(domainName.toLowerCase()) || mockup.domainname === domainName
       );
       setMockups(filteredMockups);
       setNoMockupsFound(filteredMockups.length === 0);
@@ -160,6 +161,7 @@ const DomainLayout = ({ tabName, mockupList, handleSortSelect, handleSearchSubmi
           favorites={favorites}
           handleFavorite={handleFavorite}
           handleCheckboxChange={handleCheckboxChange}
+          tabName={tabName}
         />
       </Col>
     ));
@@ -208,8 +210,7 @@ const DomainLayout = ({ tabName, mockupList, handleSortSelect, handleSearchSubmi
                   {isLoadingFavorites ? "Loading..." : "My Favorites"}
                 </Button>
               )}
-
-              {user?.role === "Admin" && (
+              {user?.role === "Admin" && tabName !== 'Case Studies' && (
                 <Button
                   variant="outline-secondary"
                   className="me-2 d-flex align-items-center"

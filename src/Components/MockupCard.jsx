@@ -9,7 +9,7 @@ import {
   Carousel,
 } from "react-bootstrap";
 
-const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites, handleFavorite, handleCheckboxChange }) => {
+const MockupCard = ({ tabName, handleCardClick, mockup, user, selectedMockups, favorites, handleFavorite, handleCheckboxChange }) => {
     const [index, setIndex] = useState(0);
     const handleSelect = (selectedIndex) => {
       setIndex(selectedIndex);
@@ -18,7 +18,6 @@ const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites,
         e.stopPropagation(); // Prevent navigation
     };
     // const selectedMockupsIds = selectedMockups.map((sid => sid.id))
-
     return (
         <Card className="template-card" onClick={() => handleCardClick(mockup, index)}>
             <div className="checkbox-container d-flex align-items-center">
@@ -41,11 +40,11 @@ const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites,
             />
             </div>
             <Carousel interval={null}  activeIndex={index} onSelect={handleSelect} onClick={handleCarouselClick}>
-            {(mockup.mockupsData || []).map((mocked, index) => (
+            {(mockup.images || []).map((image, index) => (
                 <Carousel.Item key={index}>
                 <img
                     className="d-block w-100 cardImg"
-                    src={mocked.image}
+                    src={image}
                     alt={`Slide ${index}`}
                 />
                 </Carousel.Item>
@@ -56,13 +55,33 @@ const MockupCard = ({ handleCardClick, mockup, user, selectedMockups, favorites,
                 {mockup.domainname}| {mockup.subdomainname}
             </Card.Title>
             <Card.Text>{mockup.title}</Card.Text>
-            <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
-                {mockup.mockupsData && mockup.mockupsData[index].tags.map((tag) => (
+            {tabName === 'Visual Samples' && (
+                <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
+                {mockup.mockupsData && mockup.mockupsData.length > 0 && (mockup.mockupsData[index].tags || []).map((tag) => (
                 <ListGroup.Item key={tag} className="border-0 p-0 me-2 mt-1">
                     <Badge bg="secondary">{tag}</Badge>
                 </ListGroup.Item>
                 ))}
-            </ListGroup>
+                </ListGroup>
+            )}
+            {tabName === 'Case Studies' && (
+                <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
+                {mockup.caseStudy && (mockup.caseStudy.tags || []).map((tag) => (
+                <ListGroup.Item key={tag} className="border-0 p-0 me-2 mt-1">
+                    <Badge bg="secondary">{tag}</Badge>
+                </ListGroup.Item>
+                ))}
+                </ListGroup>
+            )}
+             {tabName === 'Before After' && (
+                <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
+                 {mockup.beforeAfterData && mockup.beforeAfterData.length > 0 && (mockup.beforeAfterData[index].tags || []).map((tag) => (
+                <ListGroup.Item key={tag} className="border-0 p-0 me-2 mt-1">
+                    <Badge bg="secondary">{tag}</Badge>
+                </ListGroup.Item>
+                ))}
+                </ListGroup>
+            )}
             </Card.Body>
       </Card>
     )
