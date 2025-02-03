@@ -27,7 +27,7 @@ const sections = [
 
 
 
-const UploadMockupModal = ({ show, mockup, handleClose, onUpload, selectedTab }) => {
+const UploadMockupModal = ({ show, mockup = {}, handleClose, onUpload, selectedTab }) => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const getModuleWiseData = (mockup) => {
@@ -57,12 +57,12 @@ const UploadMockupModal = ({ show, mockup, handleClose, onUpload, selectedTab })
     return data;
   }
   const [fields, setFields] = useState({
-    id: mockup.id,
-    mockuptype: mockup.mockupType.name || selectedTab || '',
-    title: mockup.title || '',
-    domain: mockup.domainname || '',
-    subdomain: mockup.subdomainname || '',
-    description: mockup.description || '',
+    id: mockup.id || '',
+    mockuptype: mockup?.mockupType?.name || selectedTab || '',
+    title: mockup?.title || '',
+    domain: mockup?.domainname || '',
+    subdomain: mockup?.subdomainname || '',
+    description: mockup?.description || '',
     mockups: [],
     tags: [],
     caseStudyFiles: [],
