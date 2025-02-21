@@ -81,7 +81,7 @@ const UploadMockupModal = ({
     title: mockup?.title || "",
     domain: mockup?.domainname || "",
     subdomain: mockup?.subdomainname || "",
-    description: mockup?.description || "",
+    description: mockup?.description || " ",
     mockups: [],
     tags: [],
     caseStudyFiles: [],
@@ -540,7 +540,7 @@ const UploadMockupModal = ({
                     </div>
                   </>
                 )}
-                {["Visual Samples", "Before After"].includes(
+                {["Visual Samples", "Before After", "Case Studies"].includes(
                   values.mockuptype
                 ) && (
                   <Form.Group className="mb-3">
