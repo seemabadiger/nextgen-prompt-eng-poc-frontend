@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Container, Carousel, Row, Col, Button, Modal } from 'react-bootstrap';
 import HeaderComponent from './HeaderComponent';
@@ -21,7 +21,7 @@ const MockupDetailsPage = () => {
     const [deleteError, setDeleteError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false); // State to manage the visibility of the edit modal
 
-    if (!mockup) return <div>Mockup not found</div>;
+
     const handleSelect = (selectedIndex) => {
         setActiveIndex(selectedIndex);
     };
@@ -38,6 +38,25 @@ const MockupDetailsPage = () => {
         setShowDeleteModal(true);
         setDeleteError('');
     };
+
+    const getDeliverables = async () => {
+        try {
+            const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables`);
+            if (response.status === 200) {
+                console.log(response)
+                setShowDeleteModal(false);
+            }
+
+        } catch (error) {
+            console.error('Error deleting mockup:', error);
+            setDeleteError('Failed to delete mockup. Please try again.');
+        }
+    };
+
+    useEffect(() => {
+        getDeliverables()
+    }, [])
+
 
     const handleDelete = async () => {
         setIsDeleting(true);
@@ -88,6 +107,8 @@ const MockupDetailsPage = () => {
         maxHeight: '100%',
         objectFit: 'contain',
     };
+
+    if (!mockup) return <div>Mockup not found</div>;
 
     return (
         <Container fluid className="p-4">

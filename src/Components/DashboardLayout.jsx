@@ -31,6 +31,8 @@ const DashboardLayout = () => {
   // const [showFavorites, setShowFavorites] = useState(false);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
   const [noMockupsFound, setNoMockupsFound] = useState(false);
+  const [deliverables, setDeliverables] = useState([])
+  const [diagrams, setDiagrams] = useState([])
 
   // Fetch mockups on component mount
   useEffect(() => {
@@ -46,6 +48,67 @@ const DashboardLayout = () => {
       sortMockups(sortOption);
     }
   }, [sortOption]);
+
+
+  // const [deliverables1, setDeliverables1] = useState([]);
+  // const [deliverables2, setDeliverables2] = useState([]);
+  // const [deliverables3, setDeliverables3] = useState([]);
+  // const [deliverables4, setDeliverables4] = useState([]);
+  const fetchDeliverablesAndDiagrams = async () => {
+    try {
+
+      const response = await axios.get(
+        "https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/getprocessdiagrams"
+      );
+      // setDiagrams(response.data);
+
+
+      // const deliverablesData = deliverables.data; // Array of deliverables
+      const diagramsData = response.data
+      setDiagrams(diagramsData);
+    } catch (error) {
+      console.error("Error fetching diagrams:", error);
+      alert("Failed to fetch process diagrams. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+
+
+    fetchDeliverablesAndDiagrams();
+  }, []);
+
+  const convertDeliverables = (processData, processTypeData, processId) => {
+    // Find the process matching the given processId
+    const process = processData.find((item) => item.processId === processId);
+
+    // Get the deliverables for the specific process
+    const processDeliverables = process?.deliverables || [];
+
+    // Filter deliverables from the second input that match the same processId
+    const processTypeDeliverables = processTypeData.filter(
+      (item) => item.processTypeId === processId
+    );
+
+    // Map the deliverables to the desired format
+    const result = processTypeDeliverables.map((typeDeliverable) => {
+      // Find the corresponding deliverable in the first input
+      const match = processDeliverables.find(
+        (deliverable) =>
+          deliverable.deliverableName === typeDeliverable.deliverableName
+      );
+
+      return {
+        label: typeDeliverable.deliverableName,
+        link: match?.deliverableLink || "",
+        file: match?.deliverableFilePath || "",
+      };
+    });
+
+    return result;
+  };
 
   const getModuleWiseData = (mockup) => {
     const data = {
@@ -138,6 +201,23 @@ const DashboardLayout = () => {
   const handleUpload = () => {
     fetchMockups(user.id);
   };
+
+  const getDeliverables = async () => {
+    try {
+        const response = await axios.get(`https://hxstudiofileuploadv1.azurewebsites.net/api/FileUploadAPI/deliverables`);
+        if (response.status === 200) {
+            console.log(response)
+            setDeliverables(response.data)
+        }
+
+    } catch (error) {
+        console.error('Error deleting mockup:', error);
+    }
+};
+
+useEffect(() => {
+    getDeliverables()
+}, [])
 
   const handleSearchSubmit = (searchQuery) => {
     setMockups([]);
@@ -414,6 +494,9 @@ const DashboardLayout = () => {
           handleClose={handleClose}
           onUpload={handleUpload}
           selectedTab={selectedTab}
+          deliverablesData={deliverables}
+          deliverablesAllData={diagrams}
+          fetchDeliverablesAndDiagrams={fetchDeliverablesAndDiagrams}
         />
       )}
       <OverlayLoader show={loading} />
