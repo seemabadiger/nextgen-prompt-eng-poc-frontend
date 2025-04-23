@@ -7,7 +7,7 @@ import Logo from "../assets/logo.svg";
 import HarbingerLogo from "../assets/harbinger_logo.svg";
 import UploadLogo from "../assets/upload_logo.svg";
 import Avatar from "../assets/avatar.png";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProcessDiagram from "../pages/ProcessDiagram";
 import DomainLayout from './DomainLayout'
 
@@ -21,13 +21,15 @@ const NavbarComponent = ({
   handleSearchSubmit
 }) => {
   const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const handleTabClick = (tab) => {
     handleTabSelection(tab);
   };
 
   const handleLogout = async () => {
     await logout();
-    <Navigate to="/" />;
+    navigate("/");
   };
 
   const handleUploadClick = () => {
