@@ -1,41 +1,60 @@
 import html2pdf from "html2pdf.js";
+import watermark from "../assets/watermark.svg";
 
 const preloadImage = (images) => {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous"; // Enable cross-origin if needed
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          const dataUrl = canvas.toDataURL('image/png'); // Convert to base64
-          resolve({url: images, data: dataUrl}); // Resolve with base64 string
-        };
-        img.onerror = () => reject('Error loading image: ' + images);
-        img.src = images; // Trigger image loading
-      });
-}; 
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // Enable cross-origin if needed
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const dataUrl = canvas.toDataURL("image/png"); // Convert to base64
+      resolve({ url: images, data: dataUrl }); // Resolve with base64 string
+    };
+    img.onerror = () => reject("Error loading image: " + images);
+    img.src = images; // Trigger image loading
+  });
+};
 
-const generatePdf = async (mockups, setLoading) => {
-    if (mockups.length) {
-        setLoading(true)
-        const images = await Promise.all(mockups.flatMap(mockup => mockup.images.map(i => preloadImage(i))));
-        const htmlString = mockups.map((mockup, index) => {
-        const addPageBreakClass = index > 0 ? 'class="addPageBreak"' : '';
+const generatePdf = async (mockups, setLoading, isWaterMark) => {
+  if (mockups.length) {
+    setLoading(true);
+    const images = await Promise.all(
+      mockups.flatMap((mockup) => mockup.images.map((i) => preloadImage(i)))
+    );
+    const watermarkDiv =
+      isWaterMark === true
+        ? `<img src="${watermark}" style="position: absolute; width: 70%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; height: auto; pointer-events: none;" />`
+        : "";
+    const htmlString = mockups
+      .map((mockup, index) => {
+        const addPageBreakClass = index > 0 ? 'class="addPageBreak"' : "";
         const string = `
         <!-- Header Section -->
         <div ${addPageBreakClass} style="color: #6c63ff; font-weight: bold; font-size: 1.5em;">
+       
             ${mockup?.domainname}
-            <span style="font-size: 1em; color: #333; font-weight: normal;">| ${mockup?.subdomainname}</span>
+            <span style="font-size: 1em; color: #333; font-weight: normal;">| ${
+              mockup?.subdomainname
+            }</span>
         </div>
 
         <!-- Title and Tags in Same Line -->
         <div style="display: flex; align-items: center; margin-top: 10px;">
-            <h1 style="font-weight: bold; font-size: 1.8em; color: #333; margin: 0 10 0 0;">${mockup.title}</h1>
+            <h1 style="font-weight: bold; font-size: 1.8em; color: #333; margin: 0 10 0 0;">${
+              mockup.title
+            }</h1>
+        
             <div style="display: flex; gap: 10px;">
-             ${mockup.tags.map(tag => `<div style="background-color: #f0f0f0; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 0.9em;">${tag}</div>`).join('')}
+             ${mockup.tags
+               .map(
+                 (tag) =>
+                   `<div style="background-color: #f0f0f0; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 0.9em;">${tag}</div>`
+               )
+               .join("")}
             </div>
         </div>
 
@@ -46,33 +65,39 @@ const generatePdf = async (mockups, setLoading) => {
 
         <!-- Image Section (full-width with padding) -->
         <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 20px;">
-         ${
-            mockup.images.map(image => {
-                return `<img src="${images.find(i =>i.url === image).data}" alt="mockup image" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">`
-            }).join('')
-        }
+         
+         ${mockup.images
+           .map((image) => {
+             return `<div style="position: relative">
+             ${watermarkDiv}
+             <img src="${
+               images.find((i) => i.url === image).data
+             }" alt="mockup image" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"> </div>`;
+           })
+           .join("")}
         </div>
-        `
-        return string
-        }).join('');
+        `;
+        return string;
+      })
+      .join("");
 
-        const pdfOptions = {
-            margin: 0.2,
-            filename: "download.pdf",
-            image: { type: "png", quality: 0.98 },
-            html2canvas: { scale: 2},
-            jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
-            pagebreak:    {
-                before: '.addPageBreak',
-                avoid: ['img'], // Avoid breaking images across pages
-              }
-        };
+    const pdfOptions = {
+      margin: 0.2,
+      filename: "download.pdf",
+      image: { type: "png", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
+      pagebreak: {
+        before: ".addPageBreak",
+        avoid: ["img"], // Avoid breaking images across pages
+      },
+    };
 
-        const element = document.createElement("div");
-        element.innerHTML = htmlString;
-        html2pdf().set(pdfOptions).from(element).save();
-        setLoading(false);
-    }
+    const element = document.createElement("div");
+    element.innerHTML = htmlString;
+    html2pdf().set(pdfOptions).from(element).save();
+    setLoading(false);
+  }
 };
 
 export default generatePdf;

@@ -48,8 +48,8 @@ const HeaderComponent = ({ showModal }) => {
           />
         </Navbar.Brand>
         <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            onClick={() => showModal(!0)}
+          {/* <button
+            onClick={() => showModal(true)}
             style={{
               ...buttonStyle,
               background: "transparent",
@@ -58,7 +58,7 @@ const HeaderComponent = ({ showModal }) => {
             }}
           >
             Upload Mockup
-          </button>
+          </button> */}
           <NavDropdown
             title={
               <span>
