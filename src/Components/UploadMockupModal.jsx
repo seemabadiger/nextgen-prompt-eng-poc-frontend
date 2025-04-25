@@ -770,7 +770,6 @@ const UploadMockupModal = ({
                               <Form.Control
                                 type="text"
                                 name="tags"
-                                placeholder="Add Tags"
                                 onKeyDown={(e) => {
                                   if (
                                     e.key === "Enter" &&
@@ -1120,7 +1119,6 @@ const UploadMockupModal = ({
                         <Form.Control
                           type="text"
                           name="tags"
-                          placeholder="Add Tags"
                           onKeyDown={(e) => {
                             if (
                               e.key === "Enter" &&
@@ -1351,7 +1349,6 @@ const UploadMockupModal = ({
                         <Form.Control
                           type="text"
                           name="BeforeTags"
-                          placeholder="Add Tags"
                           onKeyDown={(e) => {
                             if (
                               e.key === "Enter" &&
@@ -1579,7 +1576,6 @@ const UploadMockupModal = ({
                         <Form.Control
                           type="text"
                           name="AfterTags"
-                          placeholder="Add Tags"
                           onKeyDown={(e) => {
                             if (
                               e.key === "Enter" &&
