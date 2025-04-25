@@ -29,7 +29,7 @@ const NavbarComponent = ({
 
   const handleLogout = async () => {
     await logout();
-    navigate("/");
+    navigate("/"); //navigate to home page
   };
 
   const handleUploadClick = () => {
