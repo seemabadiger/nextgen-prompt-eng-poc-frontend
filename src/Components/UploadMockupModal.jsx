@@ -575,12 +575,12 @@ const UploadMockupModal = ({
                     <Form.Group className="mb-3">
                       <Form.Label
                         style={{
-                          fontSize: "1.2rem",
+                          fontSize: "0.875rem",
                           color: "#6E6E6E",
                           fontWeight: "bold",
                         }}
                       >
-                        Attach files
+                        ATTACH FILES
                         <span style={{ color: "red", marginLeft: "4px" }}>
                           *
                         </span>
@@ -649,6 +649,7 @@ const UploadMockupModal = ({
                           />
                         </div>
                       </div>
+                      
                     </Form.Group>
                     <ListGroup>
                       {values.mockups.map((mockup, index) => (
@@ -680,7 +681,7 @@ const UploadMockupModal = ({
                                 fontWeight: "bold",
                               }}
                             >
-                              Tags
+                              TAGS
                             </Form.Label>
                             <div>
                               {tagOptions.map((tag) => (
@@ -770,6 +771,7 @@ const UploadMockupModal = ({
                               <Form.Control
                                 type="text"
                                 name="tags"
+                                placeholder={values.tags?.length === 0 ? "Add Tags" : ""}
                                 onKeyDown={(e) => {
                                   if (
                                     e.key === "Enter" &&
@@ -804,7 +806,7 @@ const UploadMockupModal = ({
                     <Form.Group className="mb-3">
                       <Form.Label
                         style={{
-                          fontSize: "1.2rem",
+                          fontSize: "0.875rem",
                           color: "#6E6E6E",
                           fontWeight: "bold",
                         }}
@@ -917,7 +919,7 @@ const UploadMockupModal = ({
                     <Form.Group className="mb-3">
                       <Form.Label
                         style={{
-                          fontSize: "1.2rem",
+                          fontSize: "0.875rem",
                           color: "#6E6E6E",
                           fontWeight: "bold",
                         }}
@@ -1034,7 +1036,7 @@ const UploadMockupModal = ({
                           fontWeight: "bold",
                         }}
                       >
-                        Tags
+                        TAGS
                       </Form.Label>
                       <div>
                         {tagOptions.map((tag) => (
@@ -1119,6 +1121,8 @@ const UploadMockupModal = ({
                         <Form.Control
                           type="text"
                           name="tags"
+                          placeholder={values.tags?.length === 0 ? "Add Tags" : ""}
+                          // placeholder="Add Tags"
                           onKeyDown={(e) => {
                             if (
                               e.key === "Enter" &&
@@ -1147,7 +1151,7 @@ const UploadMockupModal = ({
                     <Form.Group className="mb-3">
                       <Form.Label
                         style={{
-                          fontSize: "1.2rem",
+                          fontSize: "0.875rem",
                           color: "#6E6E6E",
                           fontWeight: "bold",
                         }}
@@ -1264,7 +1268,7 @@ const UploadMockupModal = ({
                           fontWeight: "bold",
                         }}
                       >
-                        Tags
+                        TAGS
                       </Form.Label>
                       <div>
                         {tagOptions.map((tag) => (
@@ -1349,6 +1353,7 @@ const UploadMockupModal = ({
                         <Form.Control
                           type="text"
                           name="BeforeTags"
+                          placeholder={values.BeforeTags?.length === 0 ? "Add Tags" : ""}
                           onKeyDown={(e) => {
                             if (
                               e.key === "Enter" &&
@@ -1374,7 +1379,7 @@ const UploadMockupModal = ({
                     <Form.Group className="mb-3">
                       <Form.Label
                         style={{
-                          fontSize: "1.2rem",
+                          fontSize: "0.875rem",
                           color: "#6E6E6E",
                           fontWeight: "bold",
                         }}
@@ -1491,7 +1496,7 @@ const UploadMockupModal = ({
                           fontWeight: "bold",
                         }}
                       >
-                        Tags
+                        TAGS
                       </Form.Label>
                       <div>
                         {tagOptions.map((tag) => (
@@ -1576,6 +1581,7 @@ const UploadMockupModal = ({
                         <Form.Control
                           type="text"
                           name="AfterTags"
+                          placeholder={values.AfterTags?.length === 0 ? "Add Tags" : ""}
                           onKeyDown={(e) => {
                             if (
                               e.key === "Enter" &&
@@ -1724,7 +1730,7 @@ const UploadMockupModal = ({
                   onClick={handleClose}
                   disabled={loading}
                 >
-                  Close
+                  Cancel
                 </Button>
                 {/* <Button style={{ backgroundColor: '#6C67E1', borderColor: '#6C67E1' }} type="submit">Add</Button> */}
                 <Button
@@ -1744,7 +1750,7 @@ const UploadMockupModal = ({
                       <span className="visually-hidden">Loading...</span>
                     </>
                   ) : (
-                    <span>Add</span>
+                    <span>{values.id ? "Save" : "Add"}</span>
                   )}
                 </Button>
               </Modal.Footer>
