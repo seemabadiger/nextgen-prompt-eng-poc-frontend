@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useContext } from "react";
 import axios from "axios";
-import { AuthContext } from '../Context/AuthContext';
+import { AuthContext } from "../Context/AuthContext";
 import { Form } from "react-bootstrap";
 
 const SearchMockup = ({ handleSearchSubmit }) => {
@@ -14,20 +14,17 @@ const SearchMockup = ({ handleSearchSubmit }) => {
     if (!searchQuery) {
       setEmptySearchQuery(true);
       setNoMockupsFound(false);
-      setTimeout(() => {
-        setEmptySearchQuery(false);
-      }, 1000);
       return;
     }
     setEmptySearchQuery(false);
-    handleSearchSubmit(searchQuery)
+    handleSearchSubmit(searchQuery);
   };
 
   const handleSearchChange = (e) => {
+    setEmptySearchQuery(false);
     setSearchQuery(e.target.value);
     if (!e.target.value) {
       setNoMockupsFound(false);
-      setEmptySearchQuery(false);
     }
   };
 
@@ -90,7 +87,7 @@ const SearchMockup = ({ handleSearchSubmit }) => {
       </Form>
       {emptySearchQuery && (
         <div style={{ marginTop: "10px", color: "red" }}>
-          Please enter a keyword.
+          Please Enter a keyword.
         </div>
       )}
       {searchQuery && noMockupsFound && (
