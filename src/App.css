@@ -30,7 +30,7 @@
 }
 
 .login-container .form-control {
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
@@ -132,7 +132,7 @@
   font-size: 1.2rem;
   /* Adjust the size of the icon if needed */
   color: #6418C3;
-  /* Eye icon color */
+/* Eye icon color */
 }
 
 .login-usertext-password {
@@ -197,7 +197,10 @@
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
-
+.no-scroll {
+  overflow: hidden !important;
+  height: 100vh;
+}
 @media (min-width: 992px) and (max-width: 1165px) {
   .container {
     max-width: 1080px !important;
