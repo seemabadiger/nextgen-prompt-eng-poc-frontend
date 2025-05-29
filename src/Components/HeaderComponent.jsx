@@ -41,8 +41,8 @@ const HeaderComponent = ({ showModal }) => {
         >
           <img
             src={Logo}
-            width="80"
-            height="80"
+            width="136"
+            height="89"
             className="d-inline-block align-top"
             alt="Logo"
           />

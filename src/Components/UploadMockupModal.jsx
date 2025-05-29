@@ -705,7 +705,7 @@ const UploadMockupModal = ({
                               ))}
                             </div>
                             <div
-                              className="tags-input-container"
+                              className="tags-input-container mb-3 "
                               style={{
                                 display: "flex",
                                 padding: "0.8rem 0.5rem",
@@ -1059,7 +1059,7 @@ const UploadMockupModal = ({
                         ))}
                       </div>
                       <div
-                        className="tags-input-container"
+                        className="tags-input-container mb-3"
                         style={{
                           display: "flex",
                           padding: "0.8rem 0.5rem",
@@ -1291,7 +1291,7 @@ const UploadMockupModal = ({
                         ))}
                       </div>
                       <div
-                        className="tags-input-container"
+                        className="tags-input-container mb-3"
                         style={{
                           display: "flex",
                           padding: "0.8rem 0.5rem",
@@ -1519,7 +1519,7 @@ const UploadMockupModal = ({
                         ))}
                       </div>
                       <div
-                        className="tags-input-container"
+                        className="tags-input-container mb-3"
                         style={{
                           display: "flex",
                           padding: "0.8rem 0.5rem",
