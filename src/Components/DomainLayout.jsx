@@ -256,16 +256,16 @@ const DomainLayout = ({
                       horizontal: "left",
                     }}
                   >
-                    <Box p={2} display="flex" flexDirection="column" gap={1}>
+                    <Box p={1} display="flex" flexDirection="column" gap={1}>
                       <Button
                         variant="contained"
-                        color="primary"
+                        color="primary" style={{textAlign:'left',paddingBottom:'0'}}
                         onClick={() => handleGenerate(true)}
                       >
                         With Watermark
                       </Button>
                       <Button
-                        variant="outlined"
+                        variant="outlined" style={{textAlign:'left'}}
                         onClick={() => handleGenerate(false)}
                       >
                         Without Watermark
