@@ -201,6 +201,17 @@
   overflow: hidden !important;
   height: 100vh;
 }
+.carousel-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25%; 
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  pointer-events: none; 
+  z-index: 1;
+}
+
 @media (min-width: 992px) and (max-width: 1165px) {
   .container {
     max-width: 1080px !important;

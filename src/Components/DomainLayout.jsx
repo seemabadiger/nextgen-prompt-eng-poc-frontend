@@ -170,7 +170,7 @@ const DomainLayout = ({
       (res) => res?.mockupType?.name === tabName
     );
     return (selectedMockupsData || []).map((mockup) => (
-      <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
+      <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-4">
         <MockupCard
           handleCardClick={handleCardClick}
           mockup={mockup}

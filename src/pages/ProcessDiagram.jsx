@@ -115,7 +115,7 @@ const ProcessDiagram = () => {
     ))
   }
   return (
-    <div className="container product-experience-design">
+    <div className="container product-experience-design p-4">
       <div className="process-dig-title-div">
         <h1 className="process-dig-title ">Product Experience Design Process</h1>
         <img
