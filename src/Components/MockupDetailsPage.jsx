@@ -178,6 +178,7 @@ const MockupDetailsPage = () => {
                   onSelect={handleSelect}
                   className="mb-3"
                   interval={null}
+                  indicators={(mockup.images || []).length > 1}
                 >
                   {mockup.images.map((image, index) => (
                     <Carousel.Item key={index}>

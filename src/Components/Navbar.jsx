@@ -188,6 +188,7 @@ const NavbarComponent = ({
                       display: "inline-block",
                       borderBottomLeftRadius: "0px",
                       borderBottomRightRadius: "0px",
+                      borderBottom: selectedTab === "Visual Samples" ? "2px solid #FF0C0C" : "none",
                     }}
                   >
                     Visual Samples
@@ -214,6 +215,7 @@ const NavbarComponent = ({
                       padding: "0 0 6px 0",
                       height: "100%",
                       display: "inline-block",
+                      borderBottom: selectedTab === "Case Studies" ? "2px solid #FF0C0C" : "none",
                     }}
                   >
                     Case Studies
@@ -241,6 +243,7 @@ const NavbarComponent = ({
                     padding: "0 0 5px 0",
                     height: "100%",
                     display: "inline-block",
+                    borderBottom: selectedTab === "Process Diagram & Artifacts" ? "2px solid #FF0C0C" : "none",
                   }}
                 >
                   Process Diagram & Artifacts
@@ -266,6 +269,7 @@ const NavbarComponent = ({
                       padding: "0 0 6px 0",
                       height: "100%",
                       display: "inline-block",
+                      borderBottom: selectedTab === "Before After" ? "2px solid #FF0C0C" : "none",
                     }}
                   >
                     Before After
@@ -297,6 +301,7 @@ const tabStyle = {
   color: "#000",
   textDecoration: "none",
   cursor: "pointer",
+  marginBottom:"-1px"
 };
 
 const buttonStyle = {

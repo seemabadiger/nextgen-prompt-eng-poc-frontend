@@ -30,7 +30,7 @@ const SearchMockup = ({ handleSearchSubmit }) => {
 
   return (
     <div
-      className="container w-100 textBoxParentContainer"
+      className="container w-100 textBoxParentContainer px-4"
       style={{
         ...textBoxParentContainer,
         display: "flex",
@@ -45,7 +45,7 @@ const SearchMockup = ({ handleSearchSubmit }) => {
     >
       <Form onSubmit={handleSearch}>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <div className="w-100 ps-3 pt-2">
+          <div className="w-100 pt-2">
             <label
               htmlFor="keyword"
               style={{
@@ -64,7 +64,7 @@ const SearchMockup = ({ handleSearchSubmit }) => {
               style={{
                 ...inputStyle,
                 marginBottom: "5px",
-                padding: "5px 0",
+                padding: "5px",
               }}
             />
           </div>
@@ -113,6 +113,7 @@ const inputStyle = {
   outline: "none",
   padding: "5px",
   flex: 1,
+  fontSize: "16px",
 };
 
 const buttonStyle = {

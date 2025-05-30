@@ -20,6 +20,7 @@ const MockupCard = ({
   const handleCarouselClick = (e) => {
     e.stopPropagation(); // Prevent navigation
   };
+  const cardTextStyle = {fontWeight: "bold"};
   // const selectedMockupsIds = selectedMockups.map((sid => sid.id))
   return (
     <Card
@@ -50,7 +51,8 @@ const MockupCard = ({
         activeIndex={index}
         onSelect={handleSelect}
         onClick={handleCarouselClick}
-        controls={(mockup.images || []).length > 1}
+        // controls={(mockup.images || []).length > 1}
+        controls={false}
         indicators={(mockup.images || []).length > 1}
       >
         {(mockup.images || []).map((image, index) => (
@@ -62,12 +64,13 @@ const MockupCard = ({
             />
           </Carousel.Item>
         ))}
+        <div className="carousel-overlay"></div>
       </Carousel>
       <Card.Body style={{ cursor: "pointer" }}>
-        <Card.Title>
-          {mockup.domainname}| {mockup.subdomainname}
+        <Card.Title className="h6">
+          <span style={{color:'#6C67E1'}}>{mockup.domainname} </span> | {mockup.subdomainname}
         </Card.Title>
-        <Card.Text>{mockup.title}</Card.Text>
+        <Card.Text className="h5" style={{...cardTextStyle}}>{mockup.title}</Card.Text>
         {tabName === "Visual Samples" && (
           <ListGroup className="list-group-flush d-flex flex-row flex-wrap">
             {mockup.mockupsData &&

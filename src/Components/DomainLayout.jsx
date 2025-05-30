@@ -170,7 +170,7 @@ const DomainLayout = ({
       (res) => res?.mockupType?.name === tabName
     );
     return (selectedMockupsData || []).map((mockup) => (
-      <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-3">
+      <Col lg={3} md={4} sm={4} xs={6} key={mockup.id} className="mb-4">
         <MockupCard
           handleCardClick={handleCardClick}
           mockup={mockup}
@@ -256,16 +256,16 @@ const DomainLayout = ({
                       horizontal: "left",
                     }}
                   >
-                    <Box p={2} display="flex" flexDirection="column" gap={1}>
+                    <Box p={1} display="flex" flexDirection="column" gap={1}>
                       <Button
                         variant="contained"
-                        color="primary"
+                        color="primary" style={{textAlign:'left',paddingBottom:'0'}}
                         onClick={() => handleGenerate(true)}
                       >
                         With Watermark
                       </Button>
                       <Button
-                        variant="outlined"
+                        variant="outlined" style={{textAlign:'left'}}
                         onClick={() => handleGenerate(false)}
                       >
                         Without Watermark
